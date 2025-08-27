@@ -1,7 +1,7 @@
 import React from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { Card } from './components/Card/Card'
+import Card from './components/Card/Card'
 import { useDueCards } from './hooks/useDueCards'
 import { useReviewCard } from './hooks/useReviewCard'
 import { Quality } from './types'
