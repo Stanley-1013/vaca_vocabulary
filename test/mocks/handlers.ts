@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import { Card, ApiResponse } from '../../src/types'
-import { MOCK_CARDS } from '../fixtures/cards.json'
+import MOCK_CARDS from '../fixtures/cards.json'
 
 export const handlers = [
   // GET /cards?due=today
