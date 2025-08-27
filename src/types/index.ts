@@ -19,7 +19,7 @@ export interface WordForm {
 export interface Card {
   // 基本資訊
   id: string;
-  word: { base: string; forms: WordForm[] };
+  word: { base: string; phonetic?: string; forms: WordForm[] };
   posPrimary: POS | string;
   meaning: string;          // MVP: 單一意思
   synonyms: string[];       // 近義詞
