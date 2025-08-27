@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  #root {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+}
+
+@layer components {
+  .card-container {
+    @apply bg-white rounded-2xl shadow-2xl overflow-hidden max-w-md w-full mx-auto;
+    @apply transform transition-all duration-300 hover:scale-105;
+  }
+
+  .card-header {
+    @apply bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4;
+  }
+
+  .card-tabs {
+    @apply flex space-x-1 bg-white/20 rounded-lg p-1;
+  }
+
+  .card-tab {
+    @apply flex-1 py-2 px-4 rounded-md text-sm font-medium text-white/70;
+    @apply transition-all duration-200 hover:text-white/90 focus:outline-none focus:ring-2 focus:ring-white/50;
+  }
+
+  .card-tab.active {
+    @apply bg-white/30 text-white shadow-sm;
+  }
+
+  .card-content {
+    @apply p-6 min-h-[200px] flex flex-col justify-center;
+  }
+
+  .card-text {
+    @apply text-gray-800 leading-relaxed;
+  }
+
+  .card-word {
+    @apply text-3xl font-bold text-gray-900 mb-4 text-center;
+  }
+
+  .card-meaning {
+    @apply text-xl text-gray-700 mb-3;
+  }
+
+  .card-example {
+    @apply text-base text-gray-600 italic border-l-4 border-blue-200 pl-4;
+  }
+
+  .media-container {
+    @apply mt-4 rounded-lg overflow-hidden;
+  }
+
+  .review-controls {
+    @apply flex justify-center space-x-3 p-6 bg-gray-50 border-t border-gray-100;
+  }
+
+  .review-btn {
+    @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 transform active:scale-95;
+  }
+
+  .review-btn-hard {
+    @apply bg-red-500 hover:bg-red-600 text-white focus:ring-red-500;
+  }
+
+  .review-btn-good {
+    @apply bg-yellow-500 hover:bg-yellow-600 text-white focus:ring-yellow-500;
+  }
+
+  .review-btn-easy {
+    @apply bg-green-500 hover:bg-green-600 text-white focus:ring-green-500;
+  }
+
+  .progress-indicator {
+    @apply absolute top-4 right-4 bg-white/20 text-white text-xs px-2 py-1 rounded-full;
+  }
+}
+
+@layer utilities {
+  .card-face-enter {
+    @apply opacity-0 transform translate-x-4;
+  }
+
+  .card-face-enter-active {
+    @apply opacity-100 transform translate-x-0 transition-all duration-300;
+  }
+
+  .card-face-exit {
+    @apply opacity-100 transform translate-x-0;
+  }
+
+  .card-face-exit-active {
+    @apply opacity-0 transform -translate-x-4 transition-all duration-300;
+  }
+}

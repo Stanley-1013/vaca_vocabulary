@@ -12,7 +12,7 @@
  * 5. 重試機制
  */
 
-import { describe, test, expect, beforeEach, afterEach, vi } from '@jest/globals';
+import { describe, test, expect, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { rest } from 'msw';

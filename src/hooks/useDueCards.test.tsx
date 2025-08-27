@@ -12,7 +12,7 @@
  * 5. 資料更新與同步
  */
 
-import { describe, test, expect, beforeEach, afterEach, vi } from '@jest/globals';
+import { describe, test, expect, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { rest } from 'msw';

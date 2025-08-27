@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { describe, test, expect, vi } from '@jest/globals';
+import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { createTestAnchor } from '../../../test/utils/testHelpers';
 import { Anchor } from '../../types';

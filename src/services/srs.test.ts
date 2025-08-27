@@ -10,7 +10,7 @@
  * 3. 邊界條件與錯誤處理
  */
 
-import { describe, test, expect, beforeEach } from '@jest/globals';
+import { describe, test, expect, beforeEach } from 'vitest';
 import { Card, Quality } from '../types';
 import { createTestCard, testDates } from '../../test/utils/testHelpers';
 

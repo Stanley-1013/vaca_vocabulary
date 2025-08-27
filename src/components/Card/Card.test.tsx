@@ -13,7 +13,7 @@
  */
 
 import React from 'react';
-import { describe, test, expect, beforeEach, vi } from '@jest/globals';
+import { describe, test, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createTestCard, createTestAnchor } from '../../../test/utils/testHelpers';

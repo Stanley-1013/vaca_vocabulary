@@ -13,7 +13,7 @@
  */
 
 import React from 'react';
-import { describe, test, expect, vi } from '@jest/globals';
+import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Quality } from '../../types';
@@ -22,7 +22,7 @@ import { Quality } from '../../types';
 import ReviewControls from './ReviewControls';
 
 describe('ReviewControls Component', () => {
-  let mockOnRate: jest.MockedFunction<(quality: Quality) => Promise<void>>;
+  let mockOnRate: ReturnType<typeof vi.fn<[quality: Quality], Promise<void>>>;
 
   beforeEach(() => {
     mockOnRate = vi.fn().mockResolvedValue(undefined);
