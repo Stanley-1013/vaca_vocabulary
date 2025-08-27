@@ -2,7 +2,8 @@
   {
     "id": "u1",
     "word": { 
-      "base": "ubiquitous", 
+      "base": "ubiquitous",
+      "phonetic": "/juˈbɪkwɪtəs/",
       "forms": [
         {"pos":"adj.","form":"ubiquitous"},
         {"pos":"n.","form":"ubiquity"},
@@ -30,7 +31,8 @@
   {
     "id": "u2",
     "word": { 
-      "base": "ephemeral", 
+      "base": "ephemeral",
+      "phonetic": "/ɪˈfɛmərəl/",
       "forms": [
         {"pos":"adj.","form":"ephemeral"},
         {"pos":"n.","form":"ephemerality"},
@@ -59,7 +61,8 @@
   {
     "id": "u3",
     "word": { 
-      "base": "meticulous", 
+      "base": "meticulous",
+      "phonetic": "/məˈtɪkjələs/",
       "forms": [
         {"pos":"adj.","form":"meticulous"},
         {"pos":"adv.","form":"meticulously"},
@@ -87,7 +90,8 @@
   {
     "id": "u4",
     "word": { 
-      "base": "serendipity", 
+      "base": "serendipity",
+      "phonetic": "/ˌsɛrənˈdɪpəti/",
       "forms": [
         {"pos":"n.","form":"serendipity"},
         {"pos":"adj.","form":"serendipitous"},
@@ -115,7 +119,8 @@
   {
     "id": "u5",
     "word": { 
-      "base": "tenacious", 
+      "base": "tenacious",
+      "phonetic": "/təˈneɪʃəs/",
       "forms": [
         {"pos":"adj.","form":"tenacious"},
         {"pos":"n.","form":"tenacity"},

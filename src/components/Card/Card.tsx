@@ -100,9 +100,14 @@ const Card: React.FC<CardProps> = ({
               <div className="text-4xl font-bold text-gray-800 mb-4">
                 {card.word.base}
               </div>
-              <div className="text-lg text-gray-600 mb-4">
+              <div className="text-lg text-gray-600 mb-2">
                 {card.posPrimary}
               </div>
+              {card.word.phonetic && (
+                <div className="text-base text-blue-600 mb-4 font-mono">
+                  {card.word.phonetic}
+                </div>
+              )}
               {card.word.forms && card.word.forms.length > 0 && (
                 <div className="text-sm text-gray-500 space-y-1">
                   {card.word.forms.map((form, index) => (
