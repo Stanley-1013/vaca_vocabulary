@@ -35,19 +35,37 @@ React 18 + TypeScript + Vite + Tailwind CSS
 └── 開發工具: Vite (HMR + 快速冷啟)
 ```
 
-### 後端架構 (Phase 1 MVP)
+### 後端架構 (基於ADR-001 MVP策略)
+
+**Phase 1 MVP**: 快速交付 - JSON Fixtures + localStorage
+```
+React App (MVP)
+├── services/api.ts: JSON fixtures 模擬 API 
+├── services/storage.ts: localStorage 本地存儲
+└── services/notifications.ts: 空 stub 實現
+```
+
+**Phase 2+ 完整後端**: Google Sheets + Apps Script
 ```
 Google Sheets + Apps Script
 ├── 代理層: Cloudflare Workers / Netlify / Vercel Functions
 ├── 安全機制: HMAC 簽章 + Rate Limiting + Origin 白名單
-└── 資料存儲: Google Sheets (cards, candidates)
+├── services/api.ts: HTTP client 切換至真實 API
+├── services/storage.ts: IndexedDB/SQLite 離線存儲  
+└── services/notifications.ts: LocalNotifications 提醒
 ```
 
-### API 設計
-- `GET /cards?due=today` - 取得到期複習卡片
-- `POST /cards` - 新增單字卡片  
-- `PATCH /cards/:id/review` - 提交複習結果
-- `POST /llm/suggest` - AI 建議候選單字 (規劃中)
+### API 設計 (抽象化介面)
+```typescript
+interface IApiService {
+  getDueCards(): Promise<Card[]>;           // 取得到期複習卡片
+  addCard(card: NewCardInput): Promise<{id: string}>;  // 新增單字卡片  
+  reviewCard(id: string, quality: Quality): Promise<Card>; // 提交複習結果
+}
+```
+
+**MVP**: 基於 JSON fixtures 實現上述介面  
+**Future**: HTTP client 實現切換至真實後端
 
 ## 🚀 快速啟動
 
