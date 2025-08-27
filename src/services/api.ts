@@ -1,5 +1,5 @@
 import { Card, Quality, NewCardInput, ApiResponse } from '../types'
-import { MOCK_CARDS } from '../../test/fixtures/cards.json'
+import MOCK_CARDS from '../../test/fixtures/cards.json'
 
 // Service layer abstraction - MVP implementation using JSON fixtures
 export interface IApiService {
