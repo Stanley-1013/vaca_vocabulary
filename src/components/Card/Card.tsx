@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Card as CardType } from '../../types'
+import { Card as CardType, Quality } from '../../types'
 import MediaEmbed from './MediaEmbed'
+import ReviewControls from './ReviewControls'
 
 interface CardProps {
   card: CardType
   onFlip?: (face: 'front' | 'meaning' | 'example') => void
   onNext?: () => void
+  onReview?: (quality: Quality) => Promise<void>
+  isLoading?: boolean
   showNavigationHints?: boolean
 }
 
@@ -14,7 +17,9 @@ type CardFace = 'front' | 'meaning' | 'example'
 const Card: React.FC<CardProps> = ({ 
   card, 
   onFlip, 
-  onNext, 
+  onNext,
+  onReview, 
+  isLoading = false,
   showNavigationHints = true 
 }) => {
   const [currentFace, setCurrentFace] = useState<CardFace>('front')
@@ -251,6 +256,13 @@ const Card: React.FC<CardProps> = ({
           </div>
         )}
       </div>
+
+      {/* Review Controls */}
+      {onReview && (
+        <div className="mt-6">
+          <ReviewControls onRate={onReview} isLoading={isLoading} />
+        </div>
+      )}
     </div>
   )
 }
