@@ -67,6 +67,14 @@ npm run test
 ```
 
 ### 環境變數設定
+
+**Phase 1 MVP**: 使用 JSON fixtures，無需 API_BASE_URL
+```bash
+# .env.local (MVP階段可選)
+# VITE_DEBUG=true  # 開啟除錯模式
+```
+
+**Phase 2+ 後端整合**:
 ```bash
 # .env.local
 VITE_API_BASE_URL=http://localhost:3001  # 本地開發

@@ -35,7 +35,7 @@ Infrastructure:  ░░░░░░░░░░ 0% (0/10)
 |------|--------|----------|--------|------|
 | 專案文檔建立 | - | 2025-08-27 | P0 | 100% ✅ |
 
-### 🔵 待辦 (TODO) - 高優先級
+### 🔵 待辦 (TODO) - 高優先級 (基於ADR-001 MVP策略)
 | 任務 | 描述 | 預估工時 | 相依性 | 標籤 |
 |------|------|----------|--------|------|
 | **ENV-001** | Vite + React 專案初始化 | 0.5天 | 無 | `setup`, `p0` |
@@ -43,11 +43,14 @@ Infrastructure:  ░░░░░░░░░░ 0% (0/10)
 | **ENV-003** | Tailwind CSS 設定 | 0.5天 | ENV-001 | `styling`, `p0` |
 | **ENV-004** | ESLint + Prettier 配置 | 0.5天 | ENV-002 | `tooling`, `p0` |
 | **ENV-005** | Jest + RTL 測試環境 | 1天 | ENV-002 | `testing`, `p0` |
+| **SRV-001** | services/api.ts 抽象化介面 | 0.5天 | ENV-002 | `service`, `p0` |
+| **SRV-002** | services/storage.ts localStorage實作 | 0.5天 | ENV-002 | `service`, `p0` |
+| **SRV-003** | services/notifications.ts stub實作 | 0.5天 | ENV-002 | `service`, `p0` |
+| **SRV-004** | JSON fixtures 資料模擬 | 0.5天 | SRV-001 | `service`, `p0` |
 | **SRS-001** | Leitner Box 算法實作 | 1天 | ENV-002 | `core`, `p0` |
 | **SRS-002** | SM-2 算法實作 | 1天 | SRS-001 | `core`, `p0` |
 | **SRS-003** | SRS 算法單元測試 | 1天 | SRS-002 | `testing`, `p0` |
-| **API-001** | 基礎 API 服務層實作 | 1天 | ENV-002 | `api`, `p0` |
-| **API-002** | React Query 配置 | 0.5天 | API-001 | `data`, `p0` |
+| **API-002** | React Query 配置 | 0.5天 | SRV-001 | `data`, `p0` |
 
 ### 🟡 待辦 (TODO) - 中優先級  
 | 任務 | 描述 | 預估工時 | 相依性 | 標籤 |
@@ -58,12 +61,12 @@ Infrastructure:  ░░░░░░░░░░ 0% (0/10)
 | **COMP-004** | CardFaceExample 組件 | 0.5天 | COMP-001 | `component`, `p1` |
 | **COMP-005** | MediaEmbed 組件 | 1天 | COMP-004 | `component`, `p1` |
 | **COMP-006** | ReviewControls 組件 | 1天 | COMP-001 | `component`, `p1` |
-| **HOOK-001** | useDueCards hook 實作 | 1天 | API-002 | `hook`, `p1` |
-| **HOOK-002** | useReviewCard hook 實作 | 1天 | API-002 | `hook`, `p1` |  
-| **HOOK-003** | useAddCard hook 實作 | 1天 | API-002 | `hook`, `p1` |
+| **HOOK-001** | useDueCards hook 實作 | 1天 | API-002, SRV-004 | `hook`, `p1` |
+| **HOOK-002** | useReviewCard hook 實作 | 1天 | API-002, SRV-004 | `hook`, `p1` |  
+| **HOOK-003** | useAddCard hook 實作 | 1天 | API-002, SRV-004 | `hook`, `p1` |
 | **PAGE-001** | DeckView 主頁面實作 | 1.5天 | HOOK-001, COMP-001 | `page`, `p1` |
 
-### 🟤 待辦 (TODO) - 低優先級
+### 🟤 待辦 (TODO) - 低優先級 (Phase 2+ 後端整合)
 | 任務 | 描述 | 預估工時 | 相依性 | 標籤 |
 |------|------|----------|--------|------|
 | **PAGE-002** | AddCardForm 頁面實作 | 1.5天 | HOOK-003 | `page`, `p2` |
@@ -72,10 +75,13 @@ Infrastructure:  ░░░░░░░░░░ 0% (0/10)
 | **TEST-003** | API Hooks 整合測試 | 1天 | HOOK-003 | `testing`, `p2` |
 | **TEST-004** | 組件互動測試 | 1天 | PAGE-001 | `testing`, `p2` |
 | **E2E-001** | 核心學習流程 E2E 測試腳本 | 1天 | PAGE-001 | `e2e`, `p2` |
-| **DEPLOY-001** | 代理層設定 (Cloudflare Workers) | 1天 | 無 | `deploy`, `p2` |
-| **DEPLOY-002** | Google Apps Script 後端 | 2天 | API-001 | `deploy`, `p2` |
-| **DEPLOY-003** | 環境變數與部署配置 | 0.5天 | DEPLOY-001 | `deploy`, `p2` |
 | **PERF-001** | Bundle 大小優化 | 0.5天 | PAGE-002 | `performance`, `p2` |
+| **SRV-005** | services/api.ts HTTP client切換 | 1天 | MVP完成 | `service`, `phase2` |
+| **SRV-006** | services/storage.ts IndexedDB切換 | 1天 | MVP完成 | `service`, `phase2` |
+| **SRV-007** | services/notifications.ts實作 | 1天 | MVP完成 | `service`, `phase2` |
+| **DEPLOY-001** | 代理層設定 (Cloudflare Workers) | 1天 | SRV-005 | `deploy`, `phase2` |
+| **DEPLOY-002** | Google Apps Script 後端 | 2天 | DEPLOY-001 | `deploy`, `phase2` |
+| **DEPLOY-003** | 環境變數與部署配置 | 0.5天 | DEPLOY-002 | `deploy`, `phase2` |
 
 ### ⏸️ 暫停 (On Hold)
 | 任務 | 原因 | 重新評估日期 | 標籤 |

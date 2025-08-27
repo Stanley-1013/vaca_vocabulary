@@ -806,6 +806,7 @@ describe('Security Tests', () => {
     expect(apiRequest.headers()['content-type']).toBe('application/json');
     
     // 檢查是否有 HMAC 相關頭 (由代理層添加)
+    // 注意：Phase 1 MVP 使用 JSON fixtures，此測試適用於 Phase 2+ 後端整合
     // 實際實作後需要驗證具體頭部名稱
   });
   
