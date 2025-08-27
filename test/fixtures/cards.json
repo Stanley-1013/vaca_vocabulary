@@ -1,0 +1,143 @@
+[
+  {
+    "id": "u1",
+    "word": { 
+      "base": "ubiquitous", 
+      "forms": [
+        {"pos":"adj.","form":"ubiquitous"},
+        {"pos":"n.","form":"ubiquity"},
+        {"pos":"adv.","form":"ubiquitously"}
+      ] 
+    },
+    "posPrimary": "adj.",
+    "meaning": "無所不在的，普遍存在的",
+    "synonyms": ["omnipresent","pervasive","universal"],
+    "antonyms": ["rare","scarce"],
+    "example": "Smartphones have become ubiquitous in modern society.",
+    "anchors": [{ 
+      "type":"image",
+      "url":"https://upload.wikimedia.org/wikipedia/commons/3/3a/Smartphone.png",
+      "title":"smartphone"
+    }],
+    "box": 1, 
+    "ease": 2.5, 
+    "reps": 0, 
+    "interval": 0,
+    "lastReviewedAt": null, 
+    "nextReviewAt": "2025-08-27T00:00:00Z", 
+    "createdAt": "2025-08-27T00:00:00Z"
+  },
+  {
+    "id": "u2",
+    "word": { 
+      "base": "ephemeral", 
+      "forms": [
+        {"pos":"adj.","form":"ephemeral"},
+        {"pos":"n.","form":"ephemerality"},
+        {"pos":"n.","form":"ephemera"},
+        {"pos":"adv.","form":"ephemerally"}
+      ] 
+    },
+    "posPrimary": "adj.",
+    "meaning": "短暫的、轉瞬即逝的",
+    "synonyms": ["transient","fleeting","momentary"],
+    "antonyms": ["lasting","enduring","permanent"],
+    "example": "The beauty of a rainbow is ephemeral, lasting only a few moments.",
+    "anchors": [{ 
+      "type":"youtube",
+      "url":"https://www.youtube.com/embed/4H0JDomv8ac",
+      "title":"rainbow timelapse"
+    }],
+    "box": 1, 
+    "ease": 2.5, 
+    "reps": 0, 
+    "interval": 0,
+    "lastReviewedAt": null, 
+    "nextReviewAt": "2025-08-27T00:00:00Z", 
+    "createdAt": "2025-08-27T00:00:00Z"
+  },
+  {
+    "id": "u3",
+    "word": { 
+      "base": "meticulous", 
+      "forms": [
+        {"pos":"adj.","form":"meticulous"},
+        {"pos":"adv.","form":"meticulously"},
+        {"pos":"n.","form":"meticulousness"}
+      ] 
+    },
+    "posPrimary": "adj.",
+    "meaning": "一絲不苟的，極度細心的",
+    "synonyms": ["careful","thorough","precise"],
+    "antonyms": ["careless","sloppy","negligent"],
+    "example": "She kept meticulous notes during the experiment.",
+    "anchors": [{ 
+      "type":"image",
+      "url":"https://upload.wikimedia.org/wikipedia/commons/0/0b/Notebook.jpg",
+      "title":"notebook"
+    }],
+    "box": 2, 
+    "ease": 2.5, 
+    "reps": 1, 
+    "interval": 2,
+    "lastReviewedAt": "2025-08-25T00:00:00Z", 
+    "nextReviewAt": "2025-08-27T00:00:00Z", 
+    "createdAt": "2025-08-20T00:00:00Z"
+  },
+  {
+    "id": "u4",
+    "word": { 
+      "base": "serendipity", 
+      "forms": [
+        {"pos":"n.","form":"serendipity"},
+        {"pos":"adj.","form":"serendipitous"},
+        {"pos":"adv.","form":"serendipitously"}
+      ] 
+    },
+    "posPrimary": "n.",
+    "meaning": "意外收穫，機緣巧合",
+    "synonyms": ["chance","fluke","fortune"],
+    "antonyms": ["misfortune","bad luck"],
+    "example": "Discovering the café was pure serendipity.",
+    "anchors": [{ 
+      "type":"image",
+      "url":"https://upload.wikimedia.org/wikipedia/commons/9/9a/Coffee_cup.jpg",
+      "title":"coffee"
+    }],
+    "box": 3, 
+    "ease": 2.6, 
+    "reps": 3, 
+    "interval": 3,
+    "lastReviewedAt": "2025-08-24T00:00:00Z", 
+    "nextReviewAt": "2025-08-27T00:00:00Z", 
+    "createdAt": "2025-08-15T00:00:00Z"
+  },
+  {
+    "id": "u5",
+    "word": { 
+      "base": "tenacious", 
+      "forms": [
+        {"pos":"adj.","form":"tenacious"},
+        {"pos":"n.","form":"tenacity"},
+        {"pos":"adv.","form":"tenaciously"}
+      ] 
+    },
+    "posPrimary": "adj.",
+    "meaning": "堅持不懈的，頑強的",
+    "synonyms": ["persistent","determined","resolute"],
+    "antonyms": ["weak","yielding","irresolute"],
+    "example": "The athlete remained tenacious, despite repeated setbacks.",
+    "anchors": [{ 
+      "type":"image",
+      "url":"https://upload.wikimedia.org/wikipedia/commons/5/5e/Start_sprint.jpg",
+      "title":"start sprint"
+    }],
+    "box": 5, 
+    "ease": 2.8, 
+    "reps": 8, 
+    "interval": 14,
+    "lastReviewedAt": "2025-08-13T00:00:00Z", 
+    "nextReviewAt": "2025-08-27T00:00:00Z", 
+    "createdAt": "2025-07-20T00:00:00Z"
+  }
+]
