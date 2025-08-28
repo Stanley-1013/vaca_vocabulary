@@ -1,8 +1,8 @@
 # SPEC.md - 功能規格書 | Vocabulary Learning App
 
-> **Version**: 1.0.0  
-> **Last Updated**: 2025-08-27  
-> **Status**: Phase 1 MVP Specification
+> **Version**: 1.1.0  
+> **Last Updated**: 2025-08-28  
+> **Status**: Phase 1 MVP + vNext Enhancement Specification
 
 ---
 
@@ -29,8 +29,17 @@
 - **新增卡片功能** - 支援多媒體錨點
 - **多媒體支援** - 圖片、YouTube、MP4、外部連結
 
+### vNext 增強功能 (Phase 1.5)
+- **每日複習上限** - 智能篩選最多 20 張到期卡片
+- **優先評分系統** - 基於難度、逾期天數、盒子層級的優先排序
+- **間隔預測顯示** - 按鈕顯示"中(3天)"、"易(7天)"格式
+- **Again 重複功能** - 當日重排佇列，不影響 SRS 進度
+- **完成頁功能** - "背更多單字"選項延長學習時間
+- **新字注入策略** - 每日 3-5 張新卡片平衡學習負擔
+
 ### 未來功能 (Phase 2+)
-- **LLM 輔助建議** - AI 生成候選單字
+- **LLM 輔助建議** - AI 生成候選單字 (`/llm/suggest`)
+- **AI 智能測驗** - 基於學習卡片生成考題 (`/llm/quiz`)
 - **多使用者支援** - 使用者隔離與權限管理
 - **進階分析** - 學習統計與進度追蹤
 - **離線模式** - Service Worker 快取
@@ -226,6 +235,91 @@ Content-Type: application/json
 **演算法說明:**
 - 伺服器端為權威計算來源
 - 客戶端僅用於預估，實際以 API 回應為準
+
+### vNext 增強 API 端點
+
+#### GET /cards?due=today&limit=20&algo=leitner
+**取得當日智能篩選卡片**
+
+**新增 Query Parameters:**
+- `limit`: number - 最大回傳卡片數 (預設 20)
+- `algo`: string - 演算法選擇 (預設 "leitner")
+
+**伺服器處理選項:**
+- **選項 A**: 回傳所有 due 卡片，由前端排序截斷
+- **選項 B**: 伺服器端排序截斷 (需與前端權重同步)
+
+#### PATCH /cards/:id/review (增強回應)
+**提交複習結果 + 預測資訊**
+
+**Enhanced Response 200:**
+```json
+{
+  "ok": true,
+  "nextReviewAt": "2025-08-28T00:00:00Z",
+  "interval": 2,
+  "box": 2,
+  "ease": 2.5,
+  "reps": 1,
+  "nextReviewIntervalDays": 2  // 新增: 用於按鈕顯示
+}
+```
+
+#### POST /llm/suggest (Phase 2+)
+**LLM 輔助新字建議**
+
+**Request Body:**
+```json
+{
+  "count": 5,
+  "tags": ["academic", "business"],  // 選填
+  "difficulty": "intermediate"       // 選填
+}
+```
+
+**Response 200:**
+```json
+{
+  "ok": true,
+  "data": [
+    {
+      "word": { "base": "ubiquitous", "phonetic": "/juˈbɪkwɪtəs/" },
+      "posPrimary": "adj.",
+      "meaning": "無所不在的",
+      "example": "Smartphones are ubiquitous in modern society.",
+      "confidence": 0.95
+    }
+  ]
+}
+```
+
+#### POST /llm/quiz (Phase 2+ Stub)
+**AI 智能測驗生成**
+
+**Request Body:**
+```json
+{
+  "cardIds": ["u1", "u2", "u3"],
+  "types": ["mcq", "cloze"],       // 選填
+  "difficulty": "medium"           // 選填
+}
+```
+
+**Response 200:**
+```json
+{
+  "ok": true,
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What does 'ubiquitous' mean?",
+      "choices": ["Rare", "Everywhere", "Expensive", "Modern"],
+      "answer": 1,
+      "cardId": "u1"
+    }
+  ]
+}
+```
 
 ---
 
@@ -504,6 +598,73 @@ if (quality === 1) {
 - **SM-2**: 動態調整，適合長期學習者
 - **預設**: Leitner (使用者可在設定中切換)
 
+### vNext 增強功能規格
+
+#### 1. 間隔預測函式 `predictNextIntervalDays()`
+```typescript
+function predictNextIntervalDays(
+  card: Card, 
+  quality: Quality, 
+  algorithm: 'leitner' | 'sm2' = 'leitner'
+): number
+```
+
+**用途**: 預測點選特定評分後的復習間隔天數，用於按鈕提示
+- **輸入**: 當前卡片狀態、預期評分、演算法選擇
+- **輸出**: 預測間隔天數 (整數)
+- **實作**: 純函式，與後端演算法保持一致
+
+#### 2. 優先評分系統
+```typescript
+interface PriorityConfig {
+  ease: number;        // 權重 0.5 - 難度項
+  overdueDays: number; // 權重 0.3 - 逾期項  
+  box: number;         // 權重 0.2 - 層級項
+}
+
+function calculatePriorityScore(
+  card: Card, 
+  today: Date, 
+  config: PriorityConfig
+): number
+```
+
+**計算公式**:
+- `difficulty = clamp(3.0 - ease, 0, 2)`
+- `overdueDays = max(0, today - nextReviewAt)` (日數)
+- `level = 5 - box` (盒子越低越優先)
+- `priorityScore = w_e * difficulty + w_o * overdueDaysNorm + w_b * levelNorm`
+
+#### 3. 每日選卡策略
+```typescript
+interface DailyConfig {
+  maxDailyReviews: number;  // 預設 20
+  minNewPerDay: number;     // 預設 3
+  maxNewPerDay: number;     // 預設 5
+}
+
+function selectTodayCards(
+  allDue: Card[], 
+  today: Date, 
+  config: DailyConfig
+): { duePicked: Card[]; needNew: number; mayNew: number }
+```
+
+#### 4. Again 重排邏輯
+```typescript
+interface AgainConfig {
+  againGapSequence: number[]; // 預設 [2, 5, 10]
+}
+
+function insertAgainCard(
+  currentQueue: Card[],
+  cardToReinsert: Card,
+  currentIndex: number,
+  againCount: number,
+  config: AgainConfig
+): Card[]
+```
+
 ---
 
 ## 🔐 安全規格
@@ -599,4 +760,10 @@ const ALLOWED_ORIGINS = [
 
 ---
 
-*本規格書為活文件，所有變更將透過 ADR (Architecture Decision Records) 記錄並更新至此文件。*
+## 📚 文檔導航
+
+- **版本歷史**: [CHANGELOG.md](../CHANGELOG.md) - 簡要版本變更記錄
+- **詳細實施**: [updates/](../updates/) - 完整的功能實施文檔  
+- **架構決策**: [adr/](../adr/) - Architecture Decision Records
+
+*本規格書為活文件，所有變更將透過 ADR 記錄並更新。當前版本 v1.1.0 (2025-08-28)。*
