@@ -3,7 +3,8 @@
 > **驗收標準 (AC) | 功能測試案例 | 測試規格書**
 
 **Project**: 背單字 MVP - Vocabulary Learning App  
-**Last Updated**: 2025-08-27  
+**Version**: 1.1.0 (vNext Enhancement)  
+**Last Updated**: 2025-08-28  
 **Testing Strategy**: TDD (Test-Driven Development)
 
 ---
@@ -130,6 +131,68 @@
 - [ ] 未知錯誤: 提供聯繫管理員選項
 - [ ] 所有錯誤都有使用者友善的文案
 
+## 🚀 vNext 1.1.0 增強功能驗收標準
+
+### AC-007: 每日複習上限與智能優先排序
+**Feature**: 系統智能選擇最重要的卡片，避免複習過載
+
+**Given**: 今日到期卡片超過每日上限 (預設20張)  
+**When**: 使用者開始複習  
+**Then**:
+- [ ] 系統顯示「今日精選 X 張卡片」提示
+- [ ] 優先選擇難度高、逾期久、低階盒子的卡片
+- [ ] 優先評分計算準確 (難度0.5 + 逾期0.3 + 層級0.2)
+- [ ] 未選中的卡片不影響 SRS 進度
+- [ ] 顯示剩餘待複習卡片數量
+
+### AC-008: Again 重複功能
+**Feature**: 當日重複學習困難卡片，不影響 SRS 演算法
+
+**Given**: 使用者在複習卡片時感覺需要重複練習  
+**When**: 使用者點擊 Again 按鈕  
+**Then**:
+- [ ] 卡片不更新 box/ease/reps/interval 數值
+- [ ] 卡片插入當日佇列，間隔為 [2,5,10] 張後重現  
+- [ ] 第二次 Again → 5 張後重現
+- [ ] 第三次 Again → 10 張後重現
+- [ ] Again 次數顯示在卡片資訊中
+
+### AC-009: 間隔預測顯示
+**Feature**: 複習按鈕顯示預測的下次複習間隔
+
+**Given**: 使用者在複習卡片  
+**When**: 使用者查看複習按鈕  
+**Then**:
+- [ ] Again 按鈕不顯示天數
+- [ ] 困難按鈕顯示「困難 (1天)」
+- [ ] 普通按鈕顯示「普通 (X天)」，X 為預測間隔
+- [ ] 容易按鈕顯示「容易 (Y天)」，Y 為預測間隔
+- [ ] 間隔預測準確度 > 95%
+
+### AC-010: 完成頁延續選項
+**Feature**: 複習完成後提供延續學習選項
+
+**Given**: 使用者完成今日所有複習卡片  
+**When**: 顯示完成頁面  
+**Then**:
+- [ ] 顯示今日學習統計 (卡片數、評分分佈)
+- [ ] 提供「背更多單字」按鈕
+- [ ] 提供「AI 智能測驗」按鈕 (Phase 2+)
+- [ ] 點擊「背更多」載入額外卡片繼續學習
+- [ ] 提供返回主頁選項
+
+### AC-011: LLM 整合準備 (API 契約)
+**Feature**: 為 Phase 2+ LLM 整合建立 API 契約
+
+**Given**: 系統需要 LLM 功能  
+**When**: 呼叫 LLM 相關 API  
+**Then**:
+- [ ] `/llm/suggest` 端點契約定義完整
+- [ ] `/llm/quiz` 端點契約定義完整
+- [ ] 錯誤處理與降級策略已規劃
+- [ ] API mock 回應格式正確
+- [ ] 前端可無痛切換至真實 LLM 服務
+
 ---
 
 ## 🧪 單元測試案例
@@ -229,6 +292,162 @@ describe('SM-2 Algorithm', () => {
       const result = nextBySM2(card, 1);
       
       expect(result.ease).toBe(1.3); // Math.max(1.3, 1.4 - 0.2)
+    });
+  });
+});
+```
+
+### vNext 1.1.0 新功能測試 (services/srs.test.ts)
+
+#### 間隔預測函式測試
+```typescript
+describe('vNext Enhancement Functions', () => {
+  describe('predictNextIntervalDays', () => {
+    test('TC-SRS-010: Leitner 算法間隔預測', () => {
+      const card = createTestCard({ box: 2, interval: 2 });
+      
+      // 評分 3 (容易) → 升盒
+      expect(predictNextIntervalDays(card, 3, 'leitner')).toBe(3);
+      
+      // 評分 2 (普通) → 維持
+      expect(predictNextIntervalDays(card, 2, 'leitner')).toBe(2);
+      
+      // 評分 1 (困難) → 回盒子1
+      expect(predictNextIntervalDays(card, 1, 'leitner')).toBe(1);
+    });
+    
+    test('TC-SRS-011: SM-2 算法間隔預測', () => {
+      const card = createTestCard({ reps: 2, interval: 6, ease: 2.5 });
+      
+      // 第三次複習開始用 ease 係數
+      const expectedInterval = Math.round(6 * 2.5); // 15天
+      expect(predictNextIntervalDays(card, 3, 'sm2')).toBe(expectedInterval);
+      
+      // 評分1重置為1天
+      expect(predictNextIntervalDays(card, 1, 'sm2')).toBe(1);
+    });
+    
+    test('TC-SRS-012: 邊界條件測試', () => {
+      const maxBoxCard = createTestCard({ box: 5 });
+      expect(predictNextIntervalDays(maxBoxCard, 3, 'leitner')).toBe(14); // 最高盒子間隔
+      
+      const newCard = createTestCard({ reps: 0 });
+      expect(predictNextIntervalDays(newCard, 2, 'sm2')).toBe(1); // 首次複習
+    });
+  });
+  
+  describe('calculatePriorityScore', () => {
+    test('TC-SRS-013: 優先評分計算正確性', () => {
+      const today = new Date('2025-08-28');
+      const config = { ease: 0.5, overdueDays: 0.3, box: 0.2 };
+      
+      // 困難卡片 (ease 低)
+      const hardCard = createTestCard({ 
+        ease: 1.5, 
+        box: 1, 
+        nextReviewAt: '2025-08-27T00:00:00Z' // 逾期1天
+      });
+      
+      const score = calculatePriorityScore(hardCard, today, config);
+      
+      // 難度項: 3.0 - 1.5 = 1.5
+      // 逾期項: 1 / 7 = 0.14 (標準化)
+      // 層級項: (5 - 1) / 4 = 1.0
+      const expected = 0.5 * 1.5 + 0.3 * 0.14 + 0.2 * 1.0;
+      
+      expect(score).toBeCloseTo(expected, 2);
+    });
+    
+    test('TC-SRS-014: 權重配置影響', () => {
+      const today = new Date('2025-08-28');
+      const card = createTestCard({ ease: 2.0, box: 3 });
+      
+      const config1 = { ease: 1.0, overdueDays: 0.0, box: 0.0 }; // 只重難度
+      const config2 = { ease: 0.0, overdueDays: 0.0, box: 1.0 }; // 只重層級
+      
+      const score1 = calculatePriorityScore(card, today, config1);
+      const score2 = calculatePriorityScore(card, today, config2);
+      
+      expect(score1).not.toBe(score2);
+    });
+  });
+  
+  describe('selectTodayCards', () => {
+    test('TC-SRS-015: 每日上限篩選', () => {
+      const cards = Array.from({ length: 30 }, (_, i) => 
+        createTestCard({ 
+          id: `card-${i}`, 
+          ease: 2.5 - (i * 0.1), // 遞減難度
+          nextReviewAt: '2025-08-27T00:00:00Z' 
+        })
+      );
+      
+      const today = new Date('2025-08-28');
+      const config = { maxDailyReviews: 20, minNewPerDay: 3 };
+      
+      const selection = selectTodayCards(cards, today, config);
+      
+      expect(selection.duePicked).toHaveLength(20);
+      
+      // 應該選擇難度最高的 (ease 最低的)
+      expect(selection.duePicked[0].ease).toBeLessThan(2.0);
+    });
+    
+    test('TC-SRS-016: 反飢餓機制', () => {
+      const starvedCard = createTestCard({ 
+        id: 'starved',
+        ease: 2.8, // 相對容易
+        box: 5,    // 高階盒子
+        // 但加上反飢餓加成
+        priorityBoost: 0.5
+      });
+      
+      const regularCards = Array.from({ length: 25 }, (_, i) => 
+        createTestCard({ 
+          id: `regular-${i}`, 
+          ease: 2.0, // 較困難
+          box: 2 
+        })
+      );
+      
+      const allCards = [starvedCard, ...regularCards];
+      const selection = selectTodayCards(allCards, new Date(), { maxDailyReviews: 20 });
+      
+      // 反飢餓卡片應該被優先選中
+      const isStarvedSelected = selection.duePicked.some(card => card.id === 'starved');
+      expect(isStarvedSelected).toBe(true);
+    });
+  });
+  
+  describe('insertAgainCard', () => {
+    test('TC-SRS-017: Again 佇列重排邏輯', () => {
+      const currentQueue = Array.from({ length: 10 }, (_, i) => 
+        createTestCard({ id: `card-${i}` })
+      );
+      
+      const againCard = createTestCard({ id: 'again-card' });
+      const againSequence = [2, 5, 10];
+      
+      // 第一次 Again
+      const newQueue1 = insertAgainCard(currentQueue, againCard, 0, againSequence);
+      const againIndex1 = newQueue1.findIndex(card => card.id === 'again-card');
+      expect(againIndex1).toBe(2); // 當前位置 + againSequence[0]
+      
+      // 第二次 Again
+      const newQueue2 = insertAgainCard(newQueue1, againCard, 1, againSequence);
+      const againIndex2 = newQueue2.findIndex(card => card.id === 'again-card');
+      expect(againIndex2).toBe(5); // 當前位置 + againSequence[1]
+    });
+    
+    test('TC-SRS-018: Again 邊界情況', () => {
+      const shortQueue = [createTestCard({ id: 'only-card' })];
+      const againCard = createTestCard({ id: 'again-card' });
+      
+      const newQueue = insertAgainCard(shortQueue, againCard, 0, [2, 5, 10]);
+      
+      // 超出佇列長度時應該插在最後
+      expect(newQueue).toHaveLength(2);
+      expect(newQueue[1].id).toBe('again-card');
     });
   });
 });
@@ -387,47 +606,202 @@ describe('MediaEmbed Component', () => {
 });
 ```
 
-### ReviewControls 組件測試
+### ReviewControls 組件測試 (vNext 1.1.0 增強)
 ```typescript
 describe('ReviewControls Component', () => {
-  test('TC-REVIEW-001: 渲染三個評分按鈕', () => {
-    const onRate = vi.fn();
-    render(<ReviewControls onRate={onRate} />);
-    
-    expect(screen.getByRole('button', { name: /困難|1/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /普通|2/i })).toBeInTheDocument();  
-    expect(screen.getByRole('button', { name: /容易|3/i })).toBeInTheDocument();
+  const mockCard = createTestCard({ 
+    box: 2, 
+    interval: 2, 
+    ease: 2.5,
+    reps: 5 
   });
   
-  test('TC-REVIEW-002: 點擊按鈕觸發正確評分', async () => {
-    const onRate = vi.fn().mockResolvedValue(undefined);
+  test('TC-REVIEW-001: 渲染四個評分按鈕 (包含Again)', () => {
+    const onRate = vi.fn();
+    const onAgain = vi.fn();
+    
+    render(<ReviewControls 
+      onRate={onRate} 
+      onAgain={onAgain} 
+      card={mockCard} 
+      algorithm="leitner" 
+    />);
+    
+    expect(screen.getByRole('button', { name: /Again/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /困難.*\(1天\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /普通.*\(\d+天\)/i })).toBeInTheDocument();  
+    expect(screen.getByRole('button', { name: /容易.*\(\d+天\)/i })).toBeInTheDocument();
+  });
+  
+  test('TC-REVIEW-002: 間隔預測顯示正確', () => {
+    const onRate = vi.fn();
+    
+    render(<ReviewControls 
+      onRate={onRate} 
+      card={mockCard} 
+      algorithm="leitner" 
+    />);
+    
+    // Leitner 演算法預期間隔
+    expect(screen.getByRole('button', { name: /困難.*\(1天\)/i })).toBeInTheDocument(); // 回到盒子1
+    expect(screen.getByRole('button', { name: /普通.*\(2天\)/i })).toBeInTheDocument(); // 維持盒子2
+    expect(screen.getByRole('button', { name: /容易.*\(3天\)/i })).toBeInTheDocument(); // 升到盒子3
+  });
+  
+  test('TC-REVIEW-003: Again按鈕觸發正確回調', async () => {
+    const onRate = vi.fn();
+    const onAgain = vi.fn();
     const user = userEvent.setup();
     
-    render(<ReviewControls onRate={onRate} />);
+    render(<ReviewControls 
+      onRate={onRate} 
+      onAgain={onAgain} 
+      card={mockCard} 
+    />);
     
-    await user.click(screen.getByRole('button', { name: /容易|3/i }));
+    await user.click(screen.getByRole('button', { name: /Again/i }));
     
+    expect(onAgain).toHaveBeenCalledWith(mockCard);
+    expect(onRate).not.toHaveBeenCalled();
+  });
+  
+  test('TC-REVIEW-004: 鍵盤快捷鍵 1234 (包含Again)', async () => {
+    const onRate = vi.fn().mockResolvedValue(undefined);
+    const onAgain = vi.fn().mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    
+    render(<ReviewControls 
+      onRate={onRate} 
+      onAgain={onAgain} 
+      card={mockCard} 
+    />);
+    
+    await user.keyboard('1'); // Again
+    expect(onAgain).toHaveBeenCalled();
+    
+    await user.keyboard('2'); // 困難
+    expect(onRate).toHaveBeenCalledWith(1);
+    
+    await user.keyboard('3'); // 普通  
+    expect(onRate).toHaveBeenCalledWith(2);
+    
+    await user.keyboard('4'); // 容易
     expect(onRate).toHaveBeenCalledWith(3);
   });
   
-  test('TC-REVIEW-003: busy狀態時按鈕被禁用', () => {
-    const onRate = vi.fn();
-    render(<ReviewControls onRate={onRate} busy={true} />);
+  test('TC-REVIEW-005: SM-2演算法間隔顯示', () => {
+    const sm2Card = createTestCard({ reps: 3, interval: 10, ease: 2.8 });
+    
+    render(<ReviewControls 
+      onRate={vi.fn()} 
+      card={sm2Card} 
+      algorithm="sm2" 
+    />);
+    
+    // SM-2 動態間隔計算
+    const expectedEasyInterval = Math.round(10 * 2.8);
+    expect(screen.getByRole('button', { 
+      name: new RegExp(`容易.*\\(${expectedEasyInterval}天\\)`, 'i') 
+    })).toBeInTheDocument();
+  });
+  
+  test('TC-REVIEW-006: busy狀態時所有按鈕被禁用', () => {
+    render(<ReviewControls 
+      onRate={vi.fn()} 
+      onAgain={vi.fn()} 
+      card={mockCard} 
+      busy={true} 
+    />);
     
     const buttons = screen.getAllByRole('button');
+    expect(buttons).toHaveLength(4); // Again + 3個評分
     buttons.forEach(button => {
       expect(button).toBeDisabled();
     });
   });
+});
+```
+
+### CompletionPage 組件測試 (vNext 新增)
+```typescript
+describe('CompletionPage Component', () => {
+  const mockStats = {
+    reviewedCount: 15,
+    againCount: 3,
+    qualityDistribution: { 1: 2, 2: 8, 3: 5 },
+    timeSpent: 1200 // 20分鐘
+  };
   
-  test('TC-REVIEW-004: 鍵盤快捷鍵1-3', async () => {
-    const onRate = vi.fn().mockResolvedValue(undefined);
+  test('TC-COMPLETION-001: 顯示學習統計', () => {
+    const onContinue = vi.fn();
+    const onQuiz = vi.fn();
+    
+    render(<CompletionPage 
+      stats={mockStats} 
+      onContinue={onContinue} 
+      onQuiz={onQuiz} 
+    />);
+    
+    expect(screen.getByText('今日複習完成')).toBeInTheDocument();
+    expect(screen.getByText(/複習了 15 張卡片/)).toBeInTheDocument();
+    expect(screen.getByText(/用時 20 分鐘/)).toBeInTheDocument();
+    
+    // 評分分佈
+    expect(screen.getByText(/困難: 2/)).toBeInTheDocument();
+    expect(screen.getByText(/普通: 8/)).toBeInTheDocument();
+    expect(screen.getByText(/容易: 5/)).toBeInTheDocument();
+  });
+  
+  test('TC-COMPLETION-002: 延續學習選項', async () => {
+    const onContinue = vi.fn();
+    const onQuiz = vi.fn();
     const user = userEvent.setup();
     
-    render(<ReviewControls onRate={onRate} />);
+    render(<CompletionPage 
+      stats={mockStats} 
+      onContinue={onContinue} 
+      onQuiz={onQuiz} 
+    />);
     
-    await user.keyboard('2');
-    expect(onRate).toHaveBeenCalledWith(2);
+    const continueBtn = screen.getByRole('button', { name: /背更多單字/i });
+    const quizBtn = screen.getByRole('button', { name: /AI 智能測驗/i });
+    
+    expect(continueBtn).toBeInTheDocument();
+    expect(quizBtn).toBeInTheDocument();
+    
+    await user.click(continueBtn);
+    expect(onContinue).toHaveBeenCalled();
+    
+    await user.click(quizBtn);
+    expect(onQuiz).toHaveBeenCalled();
+  });
+  
+  test('TC-COMPLETION-003: Again統計顯示', () => {
+    render(<CompletionPage 
+      stats={mockStats} 
+      onContinue={vi.fn()} 
+      onQuiz={vi.fn()} 
+    />);
+    
+    expect(screen.getByText(/重複練習 3 次/)).toBeInTheDocument();
+    expect(screen.getByTestId('again-rate')).toHaveTextContent('20%'); // 3/15
+  });
+  
+  test('TC-COMPLETION-004: 返回主頁選項', async () => {
+    const onHome = vi.fn();
+    const user = userEvent.setup();
+    
+    render(<CompletionPage 
+      stats={mockStats} 
+      onContinue={vi.fn()} 
+      onQuiz={vi.fn()}
+      onHome={onHome}
+    />);
+    
+    const homeBtn = screen.getByRole('button', { name: /返回主頁/i });
+    await user.click(homeBtn);
+    
+    expect(onHome).toHaveBeenCalled();
   });
 });
 ```
@@ -529,10 +903,168 @@ describe('API Hooks Integration', () => {
 });
 ```
 
-### 組件整合測試
+### vNext 1.1.0 整合測試
 ```typescript
+describe('vNext Daily Limit Integration', () => {
+  test('TC-INTEGRATION-001: 每日上限功能整合', async () => {
+    // 模擬30張到期卡片
+    const mockCards = Array.from({ length: 30 }, (_, i) => 
+      createTestCard({ 
+        id: `card-${i}`,
+        ease: 2.5 - (i * 0.05), // 遞減難度 
+        nextReviewAt: '2025-08-27T00:00:00Z'
+      })
+    );
+    
+    server.use(
+      rest.get('/cards', (req, res, ctx) => {
+        const limit = req.url.searchParams.get('limit');
+        if (limit === '20') {
+          // 伺服器端優先排序，返回前20張
+          const sorted = mockCards
+            .sort((a, b) => b.ease - a.ease) // 難度排序
+            .slice(0, 20);
+          return res(ctx.json({ ok: true, data: sorted }));
+        }
+        return res(ctx.json({ ok: true, data: mockCards }));
+      })
+    );
+    
+    const user = userEvent.setup();
+    render(<DeckView />, { wrapper: createAppWrapper() });
+    
+    // 應該顯示限制提示
+    await screen.findByText(/今日精選 20 張卡片/i);
+    
+    // 確認只載入了20張卡片
+    const cardCounter = screen.getByTestId('card-counter');
+    expect(cardCounter).toHaveTextContent('1/20');
+    
+    // 應該顯示剩餘卡片數量
+    expect(screen.getByText(/還有 10 張待複習/i)).toBeInTheDocument();
+  });
+  
+  test('TC-INTEGRATION-002: Again功能整合流程', async () => {
+    const mockCard = createTestCard({ id: 'test-card' });
+    
+    server.use(
+      rest.get('/cards', (req, res, ctx) => 
+        res(ctx.json({ ok: true, data: [mockCard] }))
+      ),
+      rest.patch('/cards/:id/review', (req, res, ctx) => 
+        res(ctx.json({ ok: true, nextReviewAt: '2025-08-29' }))
+      )
+    );
+    
+    const user = userEvent.setup();
+    render(<DeckView />, { wrapper: createAppWrapper() });
+    
+    await screen.findByTestId('card-container');
+    
+    // 點擊Again按鈕
+    await user.click(screen.getByRole('button', { name: /Again/i }));
+    
+    // 卡片應該重新排入佇列，2張後重現
+    // 由於只有一張卡片，應該立即重現
+    expect(screen.getByTestId('card-container')).toBeInTheDocument();
+    expect(screen.getByTestId('again-indicator')).toHaveTextContent('1'); // 第一次Again
+  });
+  
+  test('TC-INTEGRATION-003: 間隔預測準確性', async () => {
+    const mockCard = createTestCard({ 
+      box: 3, 
+      interval: 3, 
+      ease: 2.6,
+      reps: 4
+    });
+    
+    server.use(
+      rest.get('/cards', (req, res, ctx) => 
+        res(ctx.json({ ok: true, data: [mockCard] }))
+      ),
+      rest.patch('/cards/:id/review', (req, res, ctx) => {
+        const body = req.body;
+        const quality = body.quality;
+        
+        // 模擬後端SRS計算
+        let nextInterval;
+        if (quality === 3) nextInterval = 7; // 預測正確
+        else if (quality === 2) nextInterval = 3; // 維持
+        else nextInterval = 1; // 回退
+        
+        return res(ctx.json({ 
+          ok: true, 
+          nextReviewAt: addDays(new Date(), nextInterval).toISOString(),
+          nextReviewIntervalDays: nextInterval 
+        }));
+      })
+    );
+    
+    const user = userEvent.setup();
+    render(<DeckView />, { wrapper: createAppWrapper() });
+    
+    await screen.findByTestId('card-container');
+    
+    // 檢查按鈕預測間隔
+    expect(screen.getByRole('button', { name: /容易.*\(7天\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /普通.*\(3天\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /困難.*\(1天\)/i })).toBeInTheDocument();
+    
+    // 點擊容易按鈕
+    await user.click(screen.getByRole('button', { name: /容易.*\(7天\)/i }));
+    
+    // 驗證預測準確度（通過API回應確認）
+    await waitFor(() => {
+      expect(screen.queryByTestId('prediction-error')).not.toBeInTheDocument();
+    });
+  });
+  
+  test('TC-INTEGRATION-004: 完成頁流程', async () => {
+    const mockCards = [
+      createTestCard({ id: 'card-1' }),
+      createTestCard({ id: 'card-2' })
+    ];
+    
+    server.use(
+      rest.get('/cards', (req, res, ctx) => {
+        const extra = req.url.searchParams.get('extra');
+        if (extra === 'true') {
+          // "背更多單字"請求
+          return res(ctx.json({ 
+            ok: true, 
+            data: [createTestCard({ id: 'extra-card' })] 
+          }));
+        }
+        return res(ctx.json({ ok: true, data: mockCards }));
+      }),
+      rest.patch('/cards/:id/review', (req, res, ctx) => 
+        res(ctx.json({ ok: true, nextReviewAt: '2025-08-29' }))
+      )
+    );
+    
+    const user = userEvent.setup();
+    render(<DeckView />, { wrapper: createAppWrapper() });
+    
+    await screen.findByTestId('card-container');
+    
+    // 完成所有卡片
+    await user.click(screen.getByRole('button', { name: /容易/i }));
+    await user.click(screen.getByRole('button', { name: /普通/i }));
+    
+    // 應該顯示完成頁
+    await screen.findByText(/今日複習完成/i);
+    
+    // 點擊"背更多單字"
+    await user.click(screen.getByRole('button', { name: /背更多單字/i }));
+    
+    // 應該載入額外卡片並回到學習界面
+    await screen.findByTestId('card-container');
+    expect(screen.getByTestId('card-id')).toHaveTextContent('extra-card');
+  });
+});
+
 describe('DeckView Integration', () => {
-  test('TC-INTEGRATION-001: 完整學習流程', async () => {
+  test('TC-INTEGRATION-005: 完整學習流程', async () => {
     const mockCards = [
       createTestCard({ id: 'card-1', word: { base: 'test1', forms: [] } }),
       createTestCard({ id: 'card-2', word: { base: 'test2', forms: [] } })
@@ -569,12 +1101,139 @@ describe('DeckView Integration', () => {
 
 ## 🌐 End-to-End 測試案例
 
+### vNext 1.1.0 E2E 測試 (e2e/vnext-features.spec.ts)
+```typescript
+import { test, expect } from '@playwright/test';
+
+describe('vNext Learning Flow E2E', () => {
+  test('TC-E2E-001: 每日上限與優先排序', async ({ page }) => {
+    // 模擬30張到期卡片的API
+    await page.route('/cards**', async route => {
+      const url = route.request().url();
+      if (url.includes('limit=20')) {
+        await route.fulfill({
+          json: { ok: true, data: Array.from({ length: 20 }, (_, i) => ({
+            id: `priority-${i}`,
+            word: { base: `word${i}`, forms: [] },
+            ease: 2.0 - (i * 0.05) // 遞減難度
+          })) }
+        });
+      } else {
+        await route.continue();
+      }
+    });
+    
+    await page.goto('/');
+    
+    // 應該顯示智能篩選提示
+    await expect(page.locator('[data-testid="daily-limit-notice"]'))
+      .toContainText('今日精選 20 張卡片');
+    
+    // 應該顯示剩餘卡片數
+    await expect(page.locator('[data-testid="remaining-count"]'))
+      .toContainText('還有 10 張待複習');
+    
+    // 開始複習
+    await page.click('[data-testid="start-review-btn"]');
+    
+    // 確認卡片計數器顯示正確
+    await expect(page.locator('[data-testid="card-counter"]'))
+      .toContainText('1/20');
+  });
+  
+  test('TC-E2E-002: Again按鈕與佇列重排', async ({ page }) => {
+    await page.goto('/');
+    await page.click('[data-testid="start-review-btn"]');
+    
+    // 確認Again按鈕存在
+    await expect(page.locator('[data-testid="again-btn"]')).toBeVisible();
+    
+    // 記錄當前卡片
+    const currentWord = await page.locator('[data-testid="word-text"]').textContent();
+    
+    // 點擊Again
+    await page.click('[data-testid="again-btn"]');
+    
+    // 確認Again指示器更新
+    await expect(page.locator('[data-testid="again-indicator"]')).toContainText('1');
+    
+    // 繼續複習其他卡片
+    await page.click('[data-testid="quality-3"]'); // 當前卡片評為容易
+    
+    // 第二張卡片
+    await page.click('[data-testid="quality-2"]');
+    
+    // 第三張卡片應該是原本Again的卡片重現
+    const returnedWord = await page.locator('[data-testid="word-text"]').textContent();
+    expect(returnedWord).toBe(currentWord);
+  });
+  
+  test('TC-E2E-003: 間隔預測顯示', async ({ page }) => {
+    await page.goto('/');
+    await page.click('[data-testid="start-review-btn"]');
+    
+    // 確認四個按鈕都有正確標籤
+    await expect(page.locator('[data-testid="again-btn"]')).toContainText('Again');
+    await expect(page.locator('[data-testid="quality-1"]')).toContainText(/困難.*\(1天\)/);
+    await expect(page.locator('[data-testid="quality-2"]')).toContainText(/普通.*\(\d+天\)/);
+    await expect(page.locator('[data-testid="quality-3"]')).toContainText(/容易.*\(\d+天\)/);
+    
+    // 鍵盤快捷鍵 1234
+    await page.keyboard.press('1'); // Again
+    await expect(page.locator('[data-testid="again-indicator"]')).toContainText('1');
+    
+    // 繼續到下一張卡片並測試其他快捷鍵
+    await page.keyboard.press('2'); // 困難
+    await page.keyboard.press('3'); // 普通  
+    await page.keyboard.press('4'); // 容易
+  });
+  
+  test('TC-E2E-004: 完成頁延續選項', async ({ page }) => {
+    // Mock extra cards API
+    await page.route('/cards**', async route => {
+      const url = route.request().url();
+      if (url.includes('extra=true')) {
+        await route.fulfill({
+          json: { ok: true, data: [
+            { id: 'extra-1', word: { base: 'bonus', forms: [] } }
+          ] }
+        });
+      } else {
+        await route.continue();
+      }
+    });
+    
+    await page.goto('/');
+    await page.click('[data-testid="start-review-btn"]');
+    
+    // 快速完成所有卡片
+    for (let i = 0; i < 3; i++) {
+      await page.click('[data-testid="quality-3"]');
+    }
+    
+    // 確認完成頁顯示
+    await expect(page.locator('[data-testid="completion-page"]')).toBeVisible();
+    
+    // 確認統計資訊
+    await expect(page.locator('[data-testid="review-stats"]'))
+      .toContainText('複習了 3 張卡片');
+    
+    // 點擊"背更多單字"
+    await page.click('[data-testid="continue-learning-btn"]');
+    
+    // 應該回到學習界面並載入額外卡片
+    await expect(page.locator('[data-testid="card-container"]')).toBeVisible();
+    await expect(page.locator('[data-testid="word-text"]')).toContainText('bonus');
+  });
+});
+```
+
 ### 核心學習流程 (e2e/learning-flow.spec.ts)
 ```typescript
 import { test, expect } from '@playwright/test';
 
 describe('Learning Flow E2E', () => {
-  test('TC-E2E-001: 完整學習工作流程', async ({ page }) => {
+  test('TC-E2E-005: 完整學習工作流程 (MVP)', async ({ page }) => {
     // 1. 進入應用
     await page.goto('/');
     
