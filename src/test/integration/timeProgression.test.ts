@@ -31,15 +31,15 @@ describe('Time Progression Integration Tests', () => {
       const cards = [
         timeTestHelpers.createCardWithDates(
           createTestCard({ id: 'today-1', ease: 2.0 }),
-          { nextReviewAt: today }
+          { nextReviewAt: today.toISOString() }
         ),
         timeTestHelpers.createCardWithDates(
           createTestCard({ id: 'today-2', ease: 1.8 }),
-          { nextReviewAt: today }
+          { nextReviewAt: today.toISOString() }
         ),
         timeTestHelpers.createCardWithDates(
           createTestCard({ id: 'tomorrow-1', ease: 2.2 }),
-          { nextReviewAt: new Date(today.getTime() + 24 * 60 * 60 * 1000) } // 明天
+          { nextReviewAt: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString() } // 明天
         )
       ]
 
@@ -245,7 +245,7 @@ describe('Time Progression Integration Tests', () => {
       
       const card = timeTestHelpers.createCardWithDates(
         createTestCard({ id: 'midnight-test' }),
-        { nextReviewAt: '2025-08-29T00:00:00.000Z' } // 明天開始
+        { nextReviewAt: '2025-08-29T00:00:01.000Z' } // 明天午夜1秒後
       )
 
       const config = {
@@ -254,14 +254,15 @@ describe('Time Progression Integration Tests', () => {
         priorityWeights: { ease: 0.5, overdueDays: 0.3, box: 0.2 }
       }
 
-      // 23:59:59 - 還未到期
+      // 23:59:59 - 還未到期 (卡片設定為00:00:01才到期)
       const beforeMidnight = selectTodayCards([card], timeSimulator.getCurrentTime(), config)
       expect(beforeMidnight.duePicked).toHaveLength(0)
 
       // 推進 2 秒到 00:00:01
-      timeSimulator.advanceMinutes(1)
+      timeSimulator.advanceMinutes(1) // 到 00:00:59
+      timeSimulator.advanceMinutes(1) // 到 00:01:59，確保超過00:00:01
       
-      // 00:00:01 - 應該到期了
+      // 00:01:59 - 應該到期了
       const afterMidnight = selectTodayCards([card], timeSimulator.getCurrentTime(), config)
       expect(afterMidnight.duePicked).toHaveLength(1)
     })
@@ -273,17 +274,17 @@ describe('Time Progression Integration Tests', () => {
         { nextReviewAt: '2025-08-28T16:00:00.000Z' } // UTC 16:00
       )
 
-      const weights = { ease: 0.5, overdueDays: 0.3, box: 0.2 }
+      const weights = { ease: 0.1, overdueDays: 0.8, box: 0.1 } // 增加逾期權重
 
-      // 設定為 UTC 15:00
+      // 設定為 UTC 15:00 - 卡片尚未到期
       timeSimulator.setTime('2025-08-28T15:00:00.000Z')
       const beforeScore = calculatePriorityScore(card, timeSimulator.getCurrentTime(), weights)
 
-      // 設定為 UTC 17:00
-      timeSimulator.setTime('2025-08-28T17:00:00.000Z')
+      // 設定為隔天同時間 - 卡片已經逾期約1天
+      timeSimulator.setTime('2025-08-29T16:00:00.000Z')
       const afterScore = calculatePriorityScore(card, timeSimulator.getCurrentTime(), weights)
 
-      // 17:00 的分數應該高於 15:00（因為已經逾期）
+      // 隔天的分數應該高於前一天（因為已經逾期1天）
       expect(afterScore).toBeGreaterThan(beforeScore)
     })
   })

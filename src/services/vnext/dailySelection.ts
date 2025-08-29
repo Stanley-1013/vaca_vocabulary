@@ -15,17 +15,23 @@ interface DailySelectionConfig {
 }
 
 /**
- * 從到期卡片中選擇今日複習卡片
- * @param dueCards 到期的卡片列表
+ * 從卡片中選擇今日複習卡片
+ * @param cards 候選卡片列表（函數會自動篩選到期的卡片）
  * @param today 今日日期
  * @param config 選卡配置
  * @returns 選卡結果
  */
 export function selectTodayCards(
-  dueCards: Card[],
+  cards: Card[],
   today: Date,
   config: DailySelectionConfig
 ): SelectionResult {
+  // 首先篩選出到期的卡片
+  const dueCards = cards.filter(card => {
+    if (!card.nextReviewAt) return false;
+    return new Date(card.nextReviewAt) <= today;
+  });
+  
   // 防止變異原始陣列
   const cardsCopy = [...dueCards];
   
