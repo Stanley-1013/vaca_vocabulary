@@ -5,6 +5,7 @@
  */
 
 import React from 'react'
+import { useI18n } from '../hooks/useI18n'
 
 interface CompletionPageProps {
   onMoreCards?: () => Promise<void>
@@ -21,6 +22,8 @@ const CompletionPage: React.FC<CompletionPageProps> = ({
   newCardsCount,
   busy = false
 }) => {
+  const { t } = useI18n()
+  
   const handleMoreCards = () => {
     if (busy || !onMoreCards) return
     onMoreCards().catch(console.error)
@@ -36,16 +39,16 @@ const CompletionPage: React.FC<CompletionPageProps> = ({
       {/* 完成統計 */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
-          🎉 今日復習完成！
+          🎉 {t('review.completed')}
         </h1>
         
         <div className="bg-gray-50 rounded-lg p-4 space-y-2">
           <div className="flex justify-between">
-            <span className="text-gray-600">已復習卡片：</span>
+            <span className="text-gray-600">{t('review.reviewedCards')}：</span>
             <span className="font-semibold text-blue-600">{reviewedCount} 張</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">新學卡片：</span>
+            <span className="text-gray-600">{t('review.newCards')}：</span>
             <span className="font-semibold text-green-600">{newCardsCount} 張</span>
           </div>
         </div>
@@ -75,7 +78,7 @@ const CompletionPage: React.FC<CompletionPageProps> = ({
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
-                📚 背更多單字
+                📚 {t('review.continueStudy')}
               </span>
             )}
           </button>
@@ -103,7 +106,7 @@ const CompletionPage: React.FC<CompletionPageProps> = ({
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
-                🤖 AI 出考題
+                🤖 {t('review.aiQuiz')}
               </span>
             )}
           </button>
@@ -119,7 +122,7 @@ const CompletionPage: React.FC<CompletionPageProps> = ({
           "
           onClick={() => window.location.reload()}
         >
-          返回首頁
+{t('review.backHome')}
         </button>
       </div>
 
