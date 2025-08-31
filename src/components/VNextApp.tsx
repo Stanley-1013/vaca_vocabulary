@@ -8,6 +8,7 @@ import React, { useState } from 'react'
 import DailyReviewManager from './DailyReviewManager'
 import SettingsPage from './SettingsPage'
 import FeatureToggle, { FEATURE_FLAGS, FeatureFlagDebugPanel, useFeatureFlag } from './FeatureToggle'
+import LanguageSelector from './LanguageSelector'
 import { useVNextSettings } from '../hooks/useVNextSettings'
 
 type ViewMode = 'review' | 'settings'
@@ -83,7 +84,14 @@ const VNextApp: React.FC = () => {
               </span>
             </h1>
             
-            <div className="flex gap-1 sm:gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* 語言選擇器 */}
+              <LanguageSelector 
+                showText={false} 
+                size="sm" 
+                className="mr-1 sm:mr-2" 
+              />
+              
               <button
                 onClick={() => setCurrentView('review')}
                 className={`px-2 sm:px-4 py-1 sm:py-2 rounded-lg font-medium transition-colors text-sm ${
