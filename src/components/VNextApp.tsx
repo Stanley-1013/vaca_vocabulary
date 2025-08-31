@@ -5,6 +5,7 @@
  */
 
 import React, { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import DailyReviewManager from './DailyReviewManager'
 import SettingsPage from './SettingsPage'
 import FeatureToggle, { FEATURE_FLAGS, FeatureFlagDebugPanel, useFeatureFlag } from './FeatureToggle'
@@ -20,6 +21,7 @@ const VNextApp: React.FC = () => {
   const [isLoadingMoreCards, setIsLoadingMoreCards] = useState(false)
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false)
   
+  const queryClient = useQueryClient()
   const { settings, saveSettings, isLoading: isSettingsLoading } = useVNextSettings()
   const { isEnabled: isQuizEnabled } = useFeatureFlag(FEATURE_FLAGS.LLM_QUIZ, true)
   const { showToast, ToastProvider } = useToast()
@@ -29,14 +31,24 @@ const VNextApp: React.FC = () => {
     
     setIsLoadingMoreCards(true)
     try {
-      // TODO: 實作載入更多卡片的邏輯
       console.log('🔄 載入更多卡片...')
-      // 模擬 API 呼叫
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      console.log('✅ 更多卡片載入完成')
-      // 這裡應該重新載入卡片資料
+      
+      // 實際調用 API 載入更多卡片
+      const { apiService } = await import('../services/api')
+      const newCards = await apiService.loadMoreCards(5)
+      
+      if (newCards.length > 0) {
+        console.log(`✅ 已載入 ${newCards.length} 張新卡片`)
+        showToast(`成功載入 ${newCards.length} 張新卡片！`, 'success')
+        
+        // 觸發重新查詢卡片資料，不需要重新載入頁面
+        await queryClient.invalidateQueries({ queryKey: ['cards', 'due'] })
+      } else {
+        showToast('沒有更多卡片可載入', 'info')
+      }
     } catch (error) {
       console.error('❌ 載入更多卡片失敗:', error)
+      showToast('載入卡片失敗，請稍後再試', 'error')
     } finally {
       setIsLoadingMoreCards(false)
     }
@@ -59,6 +71,29 @@ const VNextApp: React.FC = () => {
       alert('AI 測驗啟動失敗，請稍後再試')
     } finally {
       setIsLoadingQuiz(false)
+    }
+  }
+
+  const handleResetSetup = () => {
+    if (confirm('確定要重置所有設定並回到初始設定頁面嗎？\n\n這將清除：\n• 使用者配置\n• Google API 設定\n• 功能開關狀態\n\n注意：不會清除學習進度和卡片資料')) {
+      try {
+        // 清除設定相關的 localStorage 項目
+        localStorage.removeItem('vaca-user-config')
+        localStorage.removeItem('vaca-vnext-settings')
+        localStorage.removeItem('featureFlags')
+        localStorage.removeItem('google-auth-state')
+        
+        // 顯示成功訊息
+        showToast('設定已重置，即將重新載入...', 'success')
+        
+        // 延遲重新載入頁面
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
+      } catch (error) {
+        console.error('重置設定失敗:', error)
+        showToast('重置設定失敗', 'error')
+      }
     }
   }
 
@@ -115,6 +150,16 @@ const VNextApp: React.FC = () => {
               >
                 <span className="hidden sm:inline">⚙️ 設定</span>
                 <span className="sm:hidden">⚙️</span>
+              </button>
+              
+              {/* 重置設定按鈕 */}
+              <button
+                onClick={handleResetSetup}
+                className="px-2 sm:px-3 py-1 sm:py-2 rounded-lg font-medium text-xs sm:text-sm bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+                title="清除所有設定，回到初始設定頁面"
+              >
+                <span className="hidden sm:inline">🔄 重設</span>
+                <span className="sm:hidden">🔄</span>
               </button>
             </div>
           </div>

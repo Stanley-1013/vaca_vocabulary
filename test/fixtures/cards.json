@@ -144,5 +144,150 @@
     "lastReviewedAt": "2025-08-13T00:00:00Z", 
     "nextReviewAt": "2025-08-27T00:00:00Z", 
     "createdAt": "2025-07-20T00:00:00Z"
+  },
+  {
+    "id": "u6",
+    "word": { 
+      "base": "ambivalent",
+      "phonetic": "/æmˈbɪvələnt/",
+      "forms": [
+        {"pos":"adj.","form":"ambivalent"},
+        {"pos":"n.","form":"ambivalence"},
+        {"pos":"adv.","form":"ambivalently"}
+      ] 
+    },
+    "posPrimary": "adj.",
+    "meaning": "矛盾的，有雙重情感的",
+    "synonyms": ["conflicted","uncertain","mixed"],
+    "antonyms": ["certain","decisive","clear"],
+    "example": "She felt ambivalent about the job offer.",
+    "anchors": [{ 
+      "type":"image",
+      "url":"https://upload.wikimedia.org/wikipedia/commons/1/1a/Decision.jpg",
+      "title":"decision"
+    }],
+    "box": 1, 
+    "ease": 2.5, 
+    "reps": 0, 
+    "interval": 0,
+    "lastReviewedAt": null, 
+    "nextReviewAt": "2025-08-27T00:00:00Z", 
+    "createdAt": "2025-08-27T00:00:00Z"
+  },
+  {
+    "id": "u7",
+    "word": { 
+      "base": "gregarious",
+      "phonetic": "/ɡrɪˈɡɛrɪəs/",
+      "forms": [
+        {"pos":"adj.","form":"gregarious"},
+        {"pos":"n.","form":"gregariousness"},
+        {"pos":"adv.","form":"gregariously"}
+      ] 
+    },
+    "posPrimary": "adj.",
+    "meaning": "群居的，愛社交的",
+    "synonyms": ["sociable","outgoing","friendly"],
+    "antonyms": ["antisocial","reclusive","solitary"],
+    "example": "His gregarious nature made him popular at parties.",
+    "anchors": [{ 
+      "type":"image",
+      "url":"https://upload.wikimedia.org/wikipedia/commons/3/3e/Party.jpg",
+      "title":"party"
+    }],
+    "box": 1, 
+    "ease": 2.5, 
+    "reps": 0, 
+    "interval": 0,
+    "lastReviewedAt": null, 
+    "nextReviewAt": "2025-08-27T00:00:00Z", 
+    "createdAt": "2025-08-27T00:00:00Z"
+  },
+  {
+    "id": "u8",
+    "word": { 
+      "base": "pragmatic",
+      "phonetic": "/præɡˈmætɪk/",
+      "forms": [
+        {"pos":"adj.","form":"pragmatic"},
+        {"pos":"n.","form":"pragmatism"},
+        {"pos":"adv.","form":"pragmatically"}
+      ] 
+    },
+    "posPrimary": "adj.",
+    "meaning": "實用的，務實的",
+    "synonyms": ["practical","realistic","sensible"],
+    "antonyms": ["idealistic","impractical","theoretical"],
+    "example": "We need a pragmatic approach to solve this problem.",
+    "anchors": [{ 
+      "type":"image",
+      "url":"https://upload.wikimedia.org/wikipedia/commons/2/2e/Problem_solving.jpg",
+      "title":"problem solving"
+    }],
+    "box": 1, 
+    "ease": 2.5, 
+    "reps": 0, 
+    "interval": 0,
+    "lastReviewedAt": null, 
+    "nextReviewAt": "2025-08-27T00:00:00Z", 
+    "createdAt": "2025-08-27T00:00:00Z"
+  },
+  {
+    "id": "u9",
+    "word": { 
+      "base": "eloquent",
+      "phonetic": "/ˈɛləkwənt/",
+      "forms": [
+        {"pos":"adj.","form":"eloquent"},
+        {"pos":"n.","form":"eloquence"},
+        {"pos":"adv.","form":"eloquently"}
+      ] 
+    },
+    "posPrimary": "adj.",
+    "meaning": "雄辯的，有說服力的",
+    "synonyms": ["articulate","persuasive","fluent"],
+    "antonyms": ["inarticulate","tongue-tied","speechless"],
+    "example": "The speaker delivered an eloquent speech.",
+    "anchors": [{ 
+      "type":"image",
+      "url":"https://upload.wikimedia.org/wikipedia/commons/4/44/Speaker.jpg",
+      "title":"speaker"
+    }],
+    "box": 1, 
+    "ease": 2.5, 
+    "reps": 0, 
+    "interval": 0,
+    "lastReviewedAt": null, 
+    "nextReviewAt": "2025-08-27T00:00:00Z", 
+    "createdAt": "2025-08-27T00:00:00Z"
+  },
+  {
+    "id": "u10",
+    "word": { 
+      "base": "austere",
+      "phonetic": "/ɔˈstɪr/",
+      "forms": [
+        {"pos":"adj.","form":"austere"},
+        {"pos":"n.","form":"austerity"},
+        {"pos":"adv.","form":"austerely"}
+      ] 
+    },
+    "posPrimary": "adj.",
+    "meaning": "嚴峻的，簡樸的",
+    "synonyms": ["stern","harsh","severe"],
+    "antonyms": ["lenient","luxurious","ornate"],
+    "example": "The monastery had an austere appearance.",
+    "anchors": [{ 
+      "type":"image",
+      "url":"https://upload.wikimedia.org/wikipedia/commons/6/6a/Monastery.jpg",
+      "title":"monastery"
+    }],
+    "box": 1, 
+    "ease": 2.5, 
+    "reps": 0, 
+    "interval": 0,
+    "lastReviewedAt": null, 
+    "nextReviewAt": "2025-08-27T00:00:00Z", 
+    "createdAt": "2025-08-27T00:00:00Z"
   }
 ]

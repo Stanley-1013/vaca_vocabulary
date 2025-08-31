@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react'
 import { useUserConfig } from '../hooks/useUserConfig'
 import { useGoogleAPI } from '../hooks/useGoogleAPI'
 import SetupWizard, { UserConfig } from './Setup/SetupWizard'
-import App from '../App'
+import VNextApp from './VNextApp'
 
 interface AppLauncherProps {
   // 可選的初始設定（用於測試）
@@ -102,7 +102,7 @@ const AppLauncher: React.FC<AppLauncherProps> = ({ initialConfig }) => {
         return <AuthenticatingView />
       
       case 'app':
-        return <App />
+        return <AppView />
       
       default:
         return <LoadingView />
@@ -150,5 +150,17 @@ const AuthenticatingView: React.FC = () => (
     </div>
   </div>
 )
+
+// 主應用視圖 - 包含模式切換
+const AppView: React.FC = () => {
+  const [useVNext] = useState(true) // 預設使用 vNext 模式
+
+  return (
+    <div className="app">
+      {/* 如果需要，可以在這裡添加模式切換按鈕 */}
+      <VNextApp />
+    </div>
+  )
+}
 
 export default AppLauncher

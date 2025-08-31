@@ -7,6 +7,7 @@ export interface IApiService {
   getDueCards(): Promise<Card[]>
   addCard(card: NewCardInput): Promise<{id: string}>
   reviewCard(id: string, quality: Quality): Promise<Card>
+  loadMoreCards(count?: number): Promise<Card[]>
 }
 
 // MVP Implementation: JSON fixtures with localStorage persistence
@@ -33,6 +34,39 @@ class MockApiService implements IApiService {
     }).sort((a, b) => 
       new Date(a.nextReviewAt).getTime() - new Date(b.nextReviewAt).getTime()
     )
+  }
+
+  // 新增：載入更多卡片功能
+  async loadMoreCards(count: number = 5): Promise<Card[]> {
+    await new Promise(resolve => setTimeout(resolve, 300))
+    
+    const existingCards = this.getStoredCards()
+    const existingIds = new Set(existingCards.map(card => card.id))
+    
+    // 從 mock cards 中選擇還沒有的卡片
+    const availableCards = MOCK_CARDS.filter((card: any) => !existingIds.has(card.id))
+    const newCards = availableCards.slice(0, count)
+    
+    if (newCards.length === 0) {
+      console.log('沒有更多卡片可載入')
+      return []
+    }
+    
+    // 更新新卡片的時間，讓它們立即可用
+    const cardsToAdd = newCards.map((card: any) => ({
+      ...card,
+      nextReviewAt: new Date().toISOString(),
+      lastReviewedAt: null,
+      reps: 0,
+      interval: 0
+    }))
+    
+    // 加入到現有卡片
+    const updatedCards = [...existingCards, ...cardsToAdd]
+    this.setStoredCards(updatedCards)
+    
+    console.log(`✅ 已加入 ${cardsToAdd.length} 張新卡片`)
+    return cardsToAdd
   }
 
   async addCard(newCard: NewCardInput): Promise<{id: string}> {
@@ -169,6 +203,13 @@ class HttpApiService implements IApiService {
       // 其他欄位會由後端更新，這裡先回傳基本結構
       ...reviewResult
     } as Card
+  }
+
+  async loadMoreCards(count: number = 5): Promise<Card[]> {
+    return await this.makeRequest('/cards/more', {
+      method: 'POST',
+      body: JSON.stringify({ count })
+    })
   }
 }
 
