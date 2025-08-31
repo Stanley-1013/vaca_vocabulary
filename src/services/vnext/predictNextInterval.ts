@@ -36,7 +36,7 @@ export function predictNextIntervalDays(
  * Leitner 算法間隔預測
  */
 function predictLeitnerInterval(card: Card, quality: Quality): number {
-  let nextBox = card.box;
+  let nextBox: 1|2|3|4|5 = card.box;
   
   switch (quality) {
     case 1: // 困難 - 重置到 box 1
@@ -46,7 +46,7 @@ function predictLeitnerInterval(card: Card, quality: Quality): number {
       nextBox = card.box;
       break;
     case 3: // 簡單 - 升級到下一個 box (最大 5)
-      nextBox = Math.min(5, card.box + 1);
+      nextBox = Math.min(5, card.box + 1) as 1|2|3|4|5;
       break;
   }
   

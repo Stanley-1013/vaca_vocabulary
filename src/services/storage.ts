@@ -123,8 +123,8 @@ class IndexedDBService implements IStorageService {
     // For MVP, fallback to localStorage for synchronous interface
     try {
       localStorage.setItem(key, JSON.stringify(value))
-      // Also store in IndexedDB asynchronously
-      this.setItem(key, value).catch(console.error)
+      // Also store in IndexedDB asynchronously (修復: 調用異步版本)
+      this.setAsync(key, value).catch(console.error)
     } catch (error) {
       console.error(`Failed to set item synchronously: ${key}`, error)
     }
@@ -133,8 +133,8 @@ class IndexedDBService implements IStorageService {
   removeItem(key: string): void {
     try {
       localStorage.removeItem(key)
-      // Also remove from IndexedDB asynchronously
-      this.removeItem(key).catch(console.error)
+      // Also remove from IndexedDB asynchronously (修復: 調用異步版本)
+      this.removeAsync(key).catch(console.error)
     } catch (error) {
       console.warn(`Failed to remove item synchronously: ${key}`, error)
     }

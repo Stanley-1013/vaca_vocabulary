@@ -10,6 +10,7 @@ import SettingsPage from './SettingsPage'
 import FeatureToggle, { FEATURE_FLAGS, FeatureFlagDebugPanel, useFeatureFlag } from './FeatureToggle'
 import LanguageSelector from './LanguageSelector'
 import { useVNextSettings } from '../hooks/useVNextSettings'
+import { useToast } from './Toast'
 
 type ViewMode = 'review' | 'settings'
 
@@ -21,6 +22,7 @@ const VNextApp: React.FC = () => {
   
   const { settings, saveSettings, isLoading: isSettingsLoading } = useVNextSettings()
   const { isEnabled: isQuizEnabled } = useFeatureFlag(FEATURE_FLAGS.LLM_QUIZ, true)
+  const { showToast, ToastProvider } = useToast()
 
   const handleMoreCards = async () => {
     if (isLoadingMoreCards) return
@@ -162,14 +164,8 @@ const VNextApp: React.FC = () => {
               initialSettings={settings}
               onSave={(newSettings) => {
                 saveSettings(newSettings)
-                // 顯示保存成功提示
-                const toast = document.createElement('div')
-                toast.textContent = '設定已保存！'
-                toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg z-50'
-                document.body.appendChild(toast)
-                setTimeout(() => {
-                  document.body.removeChild(toast)
-                }, 2000)
+                // 修復：使用 React Toast 組件替代直接 DOM 操作
+                showToast('設定已保存！', 'success', 2000)
               }}
             />
           </FeatureToggle>
@@ -223,6 +219,9 @@ const VNextApp: React.FC = () => {
         <span className="hidden sm:inline">智能學習系統 1.1.0 • 增強版</span>
         <span className="sm:hidden">v1.1.0</span>
       </div>
+
+      {/* 修復：添加 Toast 提供者 */}
+      <ToastProvider />
     </div>
   )
 }
