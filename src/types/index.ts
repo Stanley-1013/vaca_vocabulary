@@ -112,11 +112,14 @@ export interface ReviewStats {
 }
 
 /**
- * LLM API 相關類型 (Phase 2+ 準備)
+ * LLM API 相關類型 (Phase 3 實裝)
  */
 export interface LLMSuggestRequest {
   count: number;
   tags?: string[];
+  difficulty?: string;
+  learned_words_summary?: string;
+  avoid_words?: string[];
 }
 
 export interface LLMQuizRequest {
@@ -130,4 +133,54 @@ export interface QuizItem {
   choices?: string[];
   answer: number | string;
   cardId: string;
+}
+
+/**
+ * LLM 服務配置
+ */
+export interface LLMConfig {
+  provider: 'colab' | 'openai' | 'claude' | 'gemini';
+  driveBasePath?: string;  // Google Drive 基礎路徑
+  apiKey?: string;         // 商業API的金鑰
+  modelName?: string;      // 指定模型名稱
+}
+
+/**
+ * LLM 生成請求狀態
+ */
+export type LLMRequestStatus = 'pending' | 'processing' | 'completed' | 'error';
+
+export interface LLMGenerateRequest {
+  id: string;
+  timestamp: string;
+  status: LLMRequestStatus;
+  request: LLMSuggestRequest;
+  response?: {
+    cards: Omit<Card, 'id' | 'box' | 'ease' | 'reps' | 'interval' | 'lastReviewedAt' | 'nextReviewAt' | 'createdAt'>[];
+  };
+  error?: string;
+}
+
+/**
+ * 考試類型標籤枚舉
+ */
+export enum ExamType {
+  IELTS = 'IELTS',
+  TOEFL = 'TOEFL', 
+  GRE = 'GRE',
+  GMAT = 'GMAT',
+  SAT = 'SAT',
+  General = 'general',
+  Business = 'business',
+  Academic = 'academic'
+}
+
+/**
+ * 難度等級
+ */
+export enum DifficultyLevel {
+  Beginner = 'beginner',      // 初級 (3.0-4.5)
+  Intermediate = 'intermediate', // 中級 (5.0-6.0)
+  UpperInt = 'upper-intermediate', // 中高級 (6.5-7.0)
+  Advanced = 'advanced'       // 高級 (7.5-9.0)
 }

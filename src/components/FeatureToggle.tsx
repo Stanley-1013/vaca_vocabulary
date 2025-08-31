@@ -22,6 +22,9 @@ export const FEATURE_FLAGS = {
   VNEXT_AGAIN_BUTTON: 'vnext_again_button',
   VNEXT_INTERVAL_DISPLAY: 'vnext_interval_display',
   
+  // 後端整合功能
+  BACKEND_INTEGRATION: 'backend_integration',
+  
   // 未來功能預留
   LLM_QUIZ: 'llm_quiz',
   LLM_NEW_WORDS: 'llm_new_words',
@@ -158,10 +161,11 @@ export const FeatureFlagDebugPanel: React.FC<{ visible?: boolean }> = ({
       <>
         <button
           onClick={() => setIsVisible(!isVisible)}
-          className="fixed bottom-4 right-4 bg-gray-800 text-white px-3 py-1 rounded text-xs z-50"
+          className="fixed bottom-2 right-2 sm:bottom-4 sm:right-16 bg-gray-800 text-white px-2 py-1 sm:px-3 sm:py-1 rounded text-xs z-50 shadow-lg"
           style={{ fontSize: '10px' }}
         >
-          🏳️ FF
+          <span className="hidden sm:inline">🏳️ FF</span>
+          <span className="sm:hidden">🏳️</span>
         </button>
 
         {isVisible && (

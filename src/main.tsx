@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App'
+import AppLauncher from './components/AppLauncher'
+import DevTestPage from './DevTestPage'
 import './index.css'
 
 // Initialize MSW for development/testing
@@ -15,9 +16,12 @@ async function enableMocking() {
 }
 
 enableMocking().then(() => {
+  // 檢查 URL 參數決定顯示測試頁面還是正式應用
+  const isTestMode = window.location.search.includes('test=true')
+  
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-      <App />
+      {isTestMode ? <DevTestPage /> : <AppLauncher />}
     </React.StrictMode>
   )
 })

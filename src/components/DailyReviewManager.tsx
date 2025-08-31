@@ -36,6 +36,7 @@ interface DailyReviewManagerProps {
   config?: Partial<DailyReviewConfig>
   onMoreCards?: () => Promise<void>
   onQuiz?: () => Promise<void>
+  busy?: boolean
 }
 
 interface AgainState {
@@ -47,7 +48,8 @@ interface AgainState {
 const DailyReviewManager: React.FC<DailyReviewManagerProps> = ({
   config: configOverride = {},
   onMoreCards,
-  onQuiz
+  onQuiz,
+  busy: externalBusy = false
 }) => {
   const config = { ...defaultConfig, ...configOverride }
   const today = new Date()
@@ -93,19 +95,19 @@ const DailyReviewManager: React.FC<DailyReviewManagerProps> = ({
     if (!currentCard || isLoading) return
 
     try {
-      // 呼叫複習 API
-      await new Promise((resolve) => {
-        reviewCard(
-          { cardId: currentCard.id, quality, algorithm: config.algorithm },
-          { onSuccess: resolve }
-        )
-      })
-
-      // 更新統計
-      setReviewedCount(prev => prev + 1)
-      
-      // 移動到下一張卡片
-      handleNextCard()
+      // 呼叫複習 API - 修正參數格式
+      reviewCard(
+        { id: currentCard.id, quality },
+        { 
+          onSuccess: () => {
+            // 更新統計
+            setReviewedCount(prev => prev + 1)
+            
+            // 移動到下一張卡片
+            handleNextCard()
+          }
+        }
+      )
     } catch (error) {
       console.error('Review failed:', error)
       // 可以添加錯誤處理 UI
@@ -202,7 +204,7 @@ const DailyReviewManager: React.FC<DailyReviewManagerProps> = ({
         onQuiz={onQuiz ? handleQuiz : undefined}
         reviewedCount={reviewedCount}
         newCardsCount={newCardsCount}
-        busy={isLoading}
+        busy={isLoading || externalBusy}
       />
     )
   }

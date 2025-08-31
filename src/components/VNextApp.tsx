@@ -7,29 +7,56 @@
 import React, { useState } from 'react'
 import DailyReviewManager from './DailyReviewManager'
 import SettingsPage from './SettingsPage'
-import FeatureToggle, { FEATURE_FLAGS, FeatureFlagDebugPanel } from './FeatureToggle'
+import FeatureToggle, { FEATURE_FLAGS, FeatureFlagDebugPanel, useFeatureFlag } from './FeatureToggle'
 import { useVNextSettings } from '../hooks/useVNextSettings'
 
 type ViewMode = 'review' | 'settings'
 
 const VNextApp: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewMode>('review')
+  const [showStatusPanel, setShowStatusPanel] = useState(false) // 預設收起
+  const [isLoadingMoreCards, setIsLoadingMoreCards] = useState(false)
+  const [isLoadingQuiz, setIsLoadingQuiz] = useState(false)
+  
   const { settings, saveSettings, isLoading: isSettingsLoading } = useVNextSettings()
+  const { isEnabled: isQuizEnabled } = useFeatureFlag(FEATURE_FLAGS.LLM_QUIZ, false)
 
   const handleMoreCards = async () => {
-    // TODO: 實作載入更多卡片的邏輯
-    console.log('載入更多卡片...')
-    // 模擬 API 呼叫
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    console.log('更多卡片載入完成')
+    if (isLoadingMoreCards) return
+    
+    setIsLoadingMoreCards(true)
+    try {
+      // TODO: 實作載入更多卡片的邏輯
+      console.log('🔄 載入更多卡片...')
+      // 模擬 API 呼叫
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      console.log('✅ 更多卡片載入完成')
+      // 這裡應該重新載入卡片資料
+    } catch (error) {
+      console.error('❌ 載入更多卡片失敗:', error)
+    } finally {
+      setIsLoadingMoreCards(false)
+    }
   }
 
   const handleQuiz = async () => {
-    // TODO: 實作 AI 測驗功能
-    console.log('啟動 AI 測驗...')
-    // 模擬 API 呼叫
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    console.log('AI 測驗準備完成')
+    if (isLoadingQuiz) return
+    
+    setIsLoadingQuiz(true)
+    try {
+      // TODO: 實作 AI 測驗功能
+      console.log('🤖 啟動 AI 測驗...')
+      console.log('📡 連接 LLM API...')
+      // 模擬較長的 LLM API 呼叫
+      await new Promise(resolve => setTimeout(resolve, 3000))
+      console.log('✅ AI 測驗準備完成')
+      alert('🎯 AI 測驗功能尚未完全實作，請等待 Phase 3 LLM 整合完成！')
+    } catch (error) {
+      console.error('❌ AI 測驗啟動失敗:', error)
+      alert('AI 測驗啟動失敗，請稍後再試')
+    } finally {
+      setIsLoadingQuiz(false)
+    }
   }
 
   if (isSettingsLoading) {
@@ -43,35 +70,41 @@ const VNextApp: React.FC = () => {
 
   return (
     <div className="vnext-app min-h-screen bg-gray-50">
-      {/* 導航列 */}
+      {/* 導航列 - 響應式 */}
       <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 py-3">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-2 sm:py-3">
           <div className="flex justify-between items-center">
-            <h1 className="text-xl font-bold text-gray-800">
-              智能學習系統 
-              <span className="text-sm font-normal text-blue-600 ml-2">vNext 1.1.0</span>
+            <h1 className="text-lg sm:text-xl font-bold text-gray-800">
+              <span className="hidden sm:inline">智能學習系統</span>
+              <span className="sm:hidden">學習系統</span>
+              <span className="text-xs sm:text-sm font-normal text-blue-600 ml-1 sm:ml-2">
+                <span className="hidden sm:inline">增強版 1.1.0</span>
+                <span className="sm:hidden">v1.1</span>
+              </span>
             </h1>
             
-            <div className="flex gap-2">
+            <div className="flex gap-1 sm:gap-2">
               <button
                 onClick={() => setCurrentView('review')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-lg font-medium transition-colors text-sm ${
                   currentView === 'review'
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                📚 複習
+                <span className="hidden sm:inline">📚 複習</span>
+                <span className="sm:hidden">📚</span>
               </button>
               <button
                 onClick={() => setCurrentView('settings')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-lg font-medium transition-colors text-sm ${
                   currentView === 'settings'
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                ⚙️ 設定
+                <span className="hidden sm:inline">⚙️ 設定</span>
+                <span className="sm:hidden">⚙️</span>
               </button>
             </div>
           </div>
@@ -87,7 +120,7 @@ const VNextApp: React.FC = () => {
             fallback={
               <div className="text-center p-8">
                 <h2 className="text-xl font-semibold text-gray-600 mb-4">
-                  vNext 功能未啟用
+                  增強功能未啟用
                 </h2>
                 <p className="text-gray-500">
                   請在開發者面板中啟用 "vnext_daily_selection" 功能
@@ -98,14 +131,8 @@ const VNextApp: React.FC = () => {
             <DailyReviewManager
               config={settings}
               onMoreCards={handleMoreCards}
-              onQuiz={
-                <FeatureToggle 
-                  featureKey={FEATURE_FLAGS.LLM_QUIZ}
-                  defaultEnabled={false}
-                >
-                  {handleQuiz}
-                </FeatureToggle>
-              }
+              onQuiz={isQuizEnabled ? handleQuiz : undefined}
+              busy={isLoadingMoreCards || isLoadingQuiz}
             />
           </FeatureToggle>
         ) : (
@@ -141,32 +168,52 @@ const VNextApp: React.FC = () => {
         )}
       </main>
 
-      {/* 功能狀態指示器 */}
-      <div className="fixed top-4 left-4 bg-white rounded-lg shadow-sm border px-3 py-2 text-xs z-40">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
+      {/* 功能狀態指示器 - 可收起/展開 */}
+      <div className="fixed top-2 left-2 sm:top-4 sm:left-4 z-40">
+        <div className="bg-white rounded-lg shadow-sm border">
+          {/* 切換按鈕 */}
+          <button
+            onClick={() => setShowStatusPanel(!showStatusPanel)}
+            className="flex items-center gap-2 px-2 py-1 sm:px-3 sm:py-2 text-xs hover:bg-gray-50 transition-colors rounded-lg w-full"
+          >
             <div className={`w-2 h-2 rounded-full ${
               settings.algorithm === 'leitner' ? 'bg-blue-500' : 'bg-purple-500'
             }`} />
-            <span>{settings.algorithm.toUpperCase()} 算法</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-500" />
-            <span>{settings.maxDailyReviews} 張/日上限</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-orange-500" />
-            <span>{settings.minNewPerDay}-{settings.maxNewPerDay} 新詞/日</span>
-          </div>
+            <span className="hidden sm:inline">狀態</span>
+            <span className="ml-auto text-gray-400">
+              {showStatusPanel ? '▼' : '▶'}
+            </span>
+          </button>
+          
+          {/* 展開的狀態面板 */}
+          {showStatusPanel && (
+            <div className="border-t px-3 py-2 text-xs space-y-1">
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${
+                  settings.algorithm === 'leitner' ? 'bg-blue-500' : 'bg-purple-500'
+                }`} />
+                <span>{settings.algorithm.toUpperCase()} 算法</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <span>{settings.maxDailyReviews} 張/日上限</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-orange-500" />
+                <span>{settings.minNewPerDay}-{settings.maxNewPerDay} 新詞/日</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* 開發者功能面板 */}
       <FeatureFlagDebugPanel />
       
-      {/* 版本資訊 */}
-      <div className="fixed bottom-4 left-4 text-xs text-gray-400 z-30">
-        vNext 1.1.0 • 前端契約模式
+      {/* 版本資訊 - 響應式位置 */}
+      <div className="fixed bottom-2 left-2 sm:bottom-4 sm:left-4 text-xs text-gray-400 z-30">
+        <span className="hidden sm:inline">智能學習系統 1.1.0 • 增強版</span>
+        <span className="sm:hidden">v1.1.0</span>
       </div>
     </div>
   )

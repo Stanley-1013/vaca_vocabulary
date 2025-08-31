@@ -5,7 +5,8 @@
  */
 
 import React, { useState, useEffect } from 'react'
-import { Algorithm, PriorityConfig } from '../types'
+import { Algorithm, PriorityConfig, LLMConfig, ExamType, DifficultyLevel } from '../types'
+import LLMSettingsSection from './Settings/LLMSettingsSection'
 
 interface SettingsPageProps {
   onSave?: (settings: VNextSettings) => void
@@ -19,6 +20,11 @@ export interface VNextSettings {
   algorithm: Algorithm
   againGapSequence: number[]
   priorityWeights: PriorityConfig
+  // Phase 3: LLM 設定
+  llmConfig: LLMConfig
+  preferredExamTypes: ExamType[]
+  defaultDifficulty: DifficultyLevel
+  generateCount: number
 }
 
 const defaultSettings: VNextSettings = {
@@ -27,7 +33,16 @@ const defaultSettings: VNextSettings = {
   maxNewPerDay: 5,
   algorithm: 'leitner',
   againGapSequence: [2, 5, 10],
-  priorityWeights: { ease: 0.5, overdueDays: 0.3, box: 0.2 }
+  priorityWeights: { ease: 0.5, overdueDays: 0.3, box: 0.2 },
+  // Phase 3: LLM 預設設定
+  llmConfig: {
+    provider: 'colab',
+    driveBasePath: '/VACA_LLM',
+    modelName: 'Qwen2.5-7B-Instruct'
+  },
+  preferredExamTypes: [ExamType.IELTS, ExamType.General],
+  defaultDifficulty: DifficultyLevel.Intermediate,
+  generateCount: 5
 }
 
 const SettingsPage: React.FC<SettingsPageProps> = ({
@@ -264,6 +279,18 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
             </div>
           </div>
         </section>
+
+        {/* Phase 3: LLM 智能生成設定 */}
+        <LLMSettingsSection
+          llmConfig={settings.llmConfig}
+          preferredExamTypes={settings.preferredExamTypes}
+          defaultDifficulty={settings.defaultDifficulty}
+          generateCount={settings.generateCount}
+          onUpdateLLMConfig={(config) => updateSetting('llmConfig', config)}
+          onUpdateExamTypes={(types) => updateSetting('preferredExamTypes', types)}
+          onUpdateDifficulty={(difficulty) => updateSetting('defaultDifficulty', difficulty)}
+          onUpdateGenerateCount={(count) => updateSetting('generateCount', count)}
+        />
       </div>
 
       {/* 操作按鈕 */}
