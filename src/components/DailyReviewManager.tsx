@@ -227,6 +227,20 @@ const DailyReviewManager: React.FC<DailyReviewManagerProps> = ({
   // 複習界面
   return (
     <div className="daily-review-manager">
+      {/* 工具欄 */}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold text-gray-800">今日複習</h2>
+        <button
+          onClick={handleMoreCards}
+          disabled={!onMoreCards || externalBusy}
+          className="px-3 py-1.5 text-sm bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white rounded-md transition-colors flex items-center gap-1"
+          title="新增更多單字卡片"
+        >
+          <span>📚</span>
+          <span className="hidden sm:inline">新增卡片</span>
+        </button>
+      </div>
+
       {/* 進度指示器 */}
       <div className="progress-bar mb-6">
         <div className="flex justify-between text-sm text-gray-600 mb-2">

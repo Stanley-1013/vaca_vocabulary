@@ -160,7 +160,7 @@ const LLMSettingsSection: React.FC<LLMSettingsSectionProps> = ({
               </div>
               <button
                 type="button"
-                onClick={() => window.open('/colab/vaca_llm_generator.ipynb', '_blank')}
+                onClick={() => window.open('https://colab.research.google.com/github/yourusername/vaca-app/blob/main/colab/vaca_llm_generator.ipynb', '_blank')}
                 className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm"
               >
                 📔 開啟 Colab
