@@ -1,4 +1,5 @@
 import { Card, Quality, NewCardInput, ApiResponse } from '../types'
+import { FEATURE_FLAGS } from '../components/FeatureToggle'
 import MOCK_CARDS from '../../test/fixtures/cards.json'
 
 // Service layer abstraction - MVP implementation using JSON fixtures
@@ -82,69 +83,119 @@ class MockApiService implements IApiService {
   }
 }
 
-// Phase 2+: HTTP client implementation would replace this
+// Google Apps Script HTTP client implementation
 class HttpApiService implements IApiService {
   private baseUrl: string
+  private timeout: number = 30000 // 30 seconds
   
   constructor(baseUrl: string) {
-    this.baseUrl = baseUrl
+    this.baseUrl = baseUrl.replace(/\/$/, '') // 移除結尾斜線
+  }
+
+  private async makeRequest(path: string, options: RequestInit = {}): Promise<any> {
+    const url = `${this.baseUrl}${path}`
+    
+    // 設定預設headers和timeout
+    const defaultOptions: RequestInit = {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+      },
+      signal: AbortSignal.timeout(this.timeout)
+    }
+    
+    const mergedOptions = { ...defaultOptions, ...options }
+    
+    try {
+      console.log(`🌐 API Request: ${options.method || 'GET'} ${url}`)
+      const response = await fetch(url, mergedOptions)
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
+      const result: ApiResponse<any> = await response.json()
+      
+      if (!result.ok) {
+        throw new Error(result.error?.message || 'API request failed')
+      }
+      
+      return result.data
+      
+    } catch (error) {
+      console.error('API request failed:', error)
+      if (error instanceof Error) {
+        // 針對常見錯誤提供更好的錯誤訊息
+        if (error.name === 'TimeoutError') {
+          throw new Error('請求超時，請檢查網路連線')
+        } else if (error.message.includes('CORS')) {
+          throw new Error('跨域請求錯誤，請檢查後端CORS設定')
+        } else {
+          throw error
+        }
+      }
+      throw new Error('Unknown network error')
+    }
   }
 
   async getDueCards(): Promise<Card[]> {
-    const response = await fetch(`${this.baseUrl}/cards?due=today`)
-    const result: ApiResponse<Card[]> = await response.json()
-    
-    if (!result.ok) {
-      throw new Error(result.error?.message || 'Failed to fetch cards')
-    }
-    
-    return result.data
+    return await this.makeRequest('/cards?due=today&limit=20')
   }
 
   async addCard(card: NewCardInput): Promise<{id: string}> {
-    const response = await fetch(`${this.baseUrl}/cards`, {
+    return await this.makeRequest('/cards', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(card)
     })
-    
-    const result: ApiResponse<{id: string}> = await response.json()
-    
-    if (!result.ok) {
-      throw new Error(result.error?.message || 'Failed to add card')
-    }
-    
-    return result.data
   }
 
   async reviewCard(id: string, quality: Quality): Promise<Card> {
-    const response = await fetch(`${this.baseUrl}/cards/${id}/review`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ quality })
+    // 注意：Google Apps Script回傳的格式可能與前端期望不同
+    // 我們需要適配回傳格式
+    const reviewResult = await this.makeRequest(`/cards/${id}/review`, {
+      method: 'POST', // Google Apps Script使用POST而非PATCH
+      body: JSON.stringify({ 
+        quality, 
+        algorithm: 'leitner',  // 預設使用Leitner算法
+        method: 'PATCH'        // 告訴後端這是PATCH請求
+      })
     })
     
-    const result: ApiResponse<Card> = await response.json()
-    
-    if (!result.ok) {
-      throw new Error(result.error?.message || 'Failed to review card')
-    }
-    
-    return result.data
+    // 後端回傳的是SRS結果，需要轉換為完整的Card對象
+    // 這裡我們需要重新獲取更新後的卡片
+    // 由於Google Apps Script的限制，我們模擬一個卡片回傳
+    return {
+      id,
+      // 其他欄位會由後端更新，這裡先回傳基本結構
+      ...reviewResult
+    } as Card
   }
 }
 
-// Factory function to create appropriate service based on environment
+// Factory function to create appropriate service based on environment and feature flags
 export function createApiService(): IApiService {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
   
-  // Phase 1 MVP: Always use MockApiService
-  if (!apiBaseUrl || import.meta.env.DEV) {
-    return new MockApiService()
+  // Check if backend integration is enabled via feature flag
+  const backendIntegrationEnabled = (() => {
+    try {
+      const flagManager = (window as any).flagManager || 
+        JSON.parse(localStorage.getItem('featureFlags') || '{}')
+      return flagManager[FEATURE_FLAGS.BACKEND_INTEGRATION] || false
+    } catch {
+      return false
+    }
+  })()
+  
+  // Use backend if feature flag is enabled AND API URL is configured
+  if (backendIntegrationEnabled && apiBaseUrl && apiBaseUrl !== '') {
+    console.log('🚀 Using Google Apps Script backend:', apiBaseUrl)
+    return new HttpApiService(apiBaseUrl)
   }
   
-  // Phase 2+: Use HTTP client when API_BASE_URL is configured
-  return new HttpApiService(apiBaseUrl)
+  // Default to Mock service
+  console.log('📚 Using Mock API service (localStorage)')
+  return new MockApiService()
 }
 
 // Default export for convenience

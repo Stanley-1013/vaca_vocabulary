@@ -260,7 +260,7 @@ const Card: React.FC<CardProps> = ({
       {/* Review Controls */}
       {onReview && (
         <div className="mt-6">
-          <ReviewControls onRate={onReview} isLoading={isLoading} />
+          <ReviewControls onRate={onReview} busy={isLoading} />
         </div>
       )}
     </div>
