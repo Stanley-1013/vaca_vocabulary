@@ -156,15 +156,32 @@ const LLMSettingsSection: React.FC<LLMSettingsSectionProps> = ({
             <div className="flex items-center justify-between bg-white rounded p-3 border border-blue-200">
               <div>
                 <div className="font-medium text-blue-800">Colab Notebook</div>
-                <div className="text-sm text-blue-600">點擊開啟單字生成器</div>
+                <div className="text-sm text-blue-600">先下載檔案，再上傳至Google Colab</div>
               </div>
-              <button
-                type="button"
-                onClick={() => window.open('https://colab.research.google.com/github/yourusername/vaca-app/blob/main/colab/vaca_llm_generator.ipynb', '_blank')}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm"
-              >
-                📔 開啟 Colab
-              </button>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    // 下載本地notebook檔案
+                    const link = document.createElement('a');
+                    link.href = '/colab/vaca_llm_generator.ipynb';
+                    link.download = 'vaca_llm_generator.ipynb';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                  className="px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm"
+                >
+                  📥 下載
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.open('https://colab.research.google.com/', '_blank')}
+                  className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm"
+                >
+                  📔 開啟 Colab
+                </button>
+              </div>
             </div>
           </div>
         </div>

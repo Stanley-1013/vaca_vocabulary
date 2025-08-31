@@ -20,7 +20,7 @@ const VNextApp: React.FC = () => {
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false)
   
   const { settings, saveSettings, isLoading: isSettingsLoading } = useVNextSettings()
-  const { isEnabled: isQuizEnabled } = useFeatureFlag(FEATURE_FLAGS.LLM_QUIZ, false)
+  const { isEnabled: isQuizEnabled } = useFeatureFlag(FEATURE_FLAGS.LLM_QUIZ, true)
 
   const handleMoreCards = async () => {
     if (isLoadingMoreCards) return
