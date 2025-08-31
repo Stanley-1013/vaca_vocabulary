@@ -54,11 +54,18 @@ const ReviewControls: React.FC<ReviewControlsProps> = ({
     }
   }, [onRate, onAgain, busy])
 
-  // Set up keyboard event listeners
+  // 修復：鍵盤事件監聽器 - 避免與 Card 組件衝突
   useEffect(() => {
-    document.addEventListener('keydown', handleKeyPress)
+    const keyHandler = (event: KeyboardEvent) => {
+      // 只處理數字鍵，其他鍵盤事件由 Card 組件處理
+      if (['1', '2', '3', '4'].includes(event.key)) {
+        handleKeyPress(event)
+      }
+    }
+
+    document.addEventListener('keydown', keyHandler)
     return () => {
-      document.removeEventListener('keydown', handleKeyPress)
+      document.removeEventListener('keydown', keyHandler)
     }
   }, [handleKeyPress])
 

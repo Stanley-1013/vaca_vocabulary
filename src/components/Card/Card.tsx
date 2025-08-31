@@ -29,6 +29,7 @@ const Card: React.FC<CardProps> = ({
     onFlip?.(newFace)
   }, [onFlip])
 
+  // 修復：穩定化回調函數，避免每次渲染都重新創建
   const handleKeyPress = useCallback((event: KeyboardEvent) => {
     switch (event.key) {
       case 'ArrowRight':
@@ -57,11 +58,19 @@ const Card: React.FC<CardProps> = ({
     }
   }, [currentFace, handleFaceChange, onNext])
 
-  // Keyboard navigation
+  // 修復：鍵盤導航 - 只在組件掛載時添加一次事件監聽器
   useEffect(() => {
-    document.addEventListener('keydown', handleKeyPress)
+    const keyHandler = (event: KeyboardEvent) => {
+      // 檢查是否為活動的卡片組件
+      if (document.activeElement?.closest('.card-container') || 
+          !document.querySelector('.card-container:hover, .card-container:focus-within')) {
+        handleKeyPress(event)
+      }
+    }
+
+    document.addEventListener('keydown', keyHandler)
     return () => {
-      document.removeEventListener('keydown', handleKeyPress)
+      document.removeEventListener('keydown', keyHandler)
     }
   }, [handleKeyPress])
 

@@ -181,7 +181,7 @@ describe('Time Progression Integration Tests', () => {
           createTestCard({ 
             id: `card-${i}`,
             ease: 1.5 + Math.random() * 1.0, // 1.5-2.5
-            box: Math.ceil(Math.random() * 5)   // 1-5
+            box: Math.ceil(Math.random() * 5) as 1|2|3|4|5   // 1-5
           }),
           { nextReviewAt: reviewDate }
         )

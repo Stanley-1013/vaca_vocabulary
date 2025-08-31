@@ -4,7 +4,7 @@
  * 整合 vNext 功能：每日選卡、優先排序、Again 佇列、完成頁
  */
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { Card, Quality, Algorithm, PriorityConfig, SelectionResult } from '../types'
 import { selectTodayCards } from '../services/vnext/dailySelection'
 import { insertAgainCard } from '../services/vnext/againQueue'
@@ -59,12 +59,12 @@ const DailyReviewManager: React.FC<DailyReviewManagerProps> = ({
   const [reviewQueue, setReviewQueue] = useState<Card[]>([])
   const [againStates, setAgainStates] = useState<Map<string, AgainState>>(new Map())
   const [reviewedCount, setReviewedCount] = useState(0)
-  const [newCardsCount, setNewCardsCount] = useState(0)
+  const [newCardsCount] = useState(0) // 移除未使用的 setter
   const [isCompleted, setIsCompleted] = useState(false)
 
   // API hooks
   const { data: dueCards = [], isLoading: isDueLoading } = useDueCards()
-  const { mutate: reviewCard, isLoading: isReviewLoading } = useReviewCard()
+  const { mutate: reviewCard, isPending: isReviewLoading } = useReviewCard()
 
   // 計算今日選卡結果
   const todaySelection: SelectionResult = useMemo(() => {
@@ -90,29 +90,35 @@ const DailyReviewManager: React.FC<DailyReviewManagerProps> = ({
   const currentCard = reviewQueue[currentIndex]
   const isLoading = isDueLoading || isReviewLoading
 
-  // 處理評分
-  const handleRate = async (quality: Quality) => {
+  // 修復：處理評分 - 避免在回調中直接更新狀態造成無限迴圈
+  const handleRate = useCallback(async (quality: Quality) => {
     if (!currentCard || isLoading) return
 
     try {
-      // 呼叫複習 API - 修正參數格式
-      reviewCard(
-        { id: currentCard.id, quality },
-        { 
-          onSuccess: () => {
-            // 更新統計
-            setReviewedCount(prev => prev + 1)
-            
-            // 移動到下一張卡片
-            handleNextCard()
+      // 使用 Promise 方式呼叫 mutation
+      await new Promise<void>((resolve, reject) => {
+        reviewCard(
+          { id: currentCard.id, quality },
+          { 
+            onSuccess: () => {
+              resolve()
+            },
+            onError: (error) => {
+              reject(error)
+            }
           }
-        }
-      )
+        )
+      })
+
+      // 成功後更新狀態
+      setReviewedCount(prev => prev + 1)
+      handleNextCard()
+
     } catch (error) {
       console.error('Review failed:', error)
       // 可以添加錯誤處理 UI
     }
-  }
+  }, [currentCard, isLoading, reviewCard])
 
   // 處理 Again
   const handleAgain = async () => {
@@ -149,8 +155,8 @@ const DailyReviewManager: React.FC<DailyReviewManagerProps> = ({
     }
   }
 
-  // 移動到下一張卡片
-  const handleNextCard = () => {
+  // 修復：移動到下一張卡片 - 使用 useCallback 穩定化
+  const handleNextCard = useCallback(() => {
     const nextIndex = currentIndex + 1
     
     if (nextIndex >= reviewQueue.length) {
@@ -159,7 +165,7 @@ const DailyReviewManager: React.FC<DailyReviewManagerProps> = ({
     } else {
       setCurrentIndex(nextIndex)
     }
-  }
+  }, [currentIndex, reviewQueue.length])
 
   // 處理背更多單字
   const handleMoreCards = async () => {
@@ -290,7 +296,7 @@ const DailyReviewManager: React.FC<DailyReviewManagerProps> = ({
       />
 
       {/* Debug 信息 (開發用) */}
-      {process.env.NODE_ENV === 'development' && (
+      {import.meta.env.MODE === 'development' && (
         <div className="mt-4 p-2 bg-gray-100 rounded text-xs text-gray-600">
           <p>Again Count: {againStates.get(currentCard.id)?.count || 0}</p>
           <p>Queue Length: {reviewQueue.length}</p>

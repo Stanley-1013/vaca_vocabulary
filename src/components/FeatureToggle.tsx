@@ -156,7 +156,7 @@ export const FeatureFlagDebugPanel: React.FC<{ visible?: boolean }> = ({
   }
 
   // 開發模式下顯示切換按鈕
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.MODE === 'development') {
     return (
       <>
         <button
