@@ -22,6 +22,7 @@ const VNextApp: React.FC = () => {
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false)
   
   const queryClient = useQueryClient()
+  
   const { settings, saveSettings, isLoading: isSettingsLoading } = useVNextSettings()
   const { isEnabled: isQuizEnabled } = useFeatureFlag(FEATURE_FLAGS.LLM_QUIZ, true)
   const { showToast, ToastProvider } = useToast()

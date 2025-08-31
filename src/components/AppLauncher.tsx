@@ -158,7 +158,15 @@ const AppView: React.FC = () => {
   return (
     <div className="app">
       {/* 如果需要，可以在這裡添加模式切換按鈕 */}
-      <VNextApp />
+      {/* 使用 React.Suspense 來處理潛在的載入問題 */}
+      <React.Suspense fallback={
+        <div className="flex justify-center items-center min-h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
+          <span className="ml-2">載入應用中...</span>
+        </div>
+      }>
+        <VNextApp />
+      </React.Suspense>
     </div>
   )
 }
