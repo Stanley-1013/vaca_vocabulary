@@ -216,10 +216,30 @@ const DailyReviewManager: React.FC<DailyReviewManagerProps> = ({
         <h2 className="text-xl font-semibold text-gray-600 mb-4">
           今日暫無複習卡片
         </h2>
-        <p className="text-gray-500">
+        <p className="text-gray-500 mb-6">
           已選擇 {todaySelection.duePicked.length} 張到期卡片，
           建議新增 {todaySelection.needNew} 張新卡片
         </p>
+        
+        {/* 新增卡片按鈕 */}
+        {onMoreCards && (
+          <button
+            onClick={handleMoreCards}
+            disabled={externalBusy}
+            className="px-6 py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white rounded-lg transition-colors flex items-center gap-2 mx-auto"
+          >
+            {externalBusy ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+                載入中...
+              </>
+            ) : (
+              <>
+                📚 新增單字卡片
+              </>
+            )}
+          </button>
+        )}
       </div>
     )
   }
