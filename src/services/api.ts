@@ -45,27 +45,33 @@ class MockApiService implements IApiService {
     
     // 從 mock cards 中選擇還沒有的卡片
     const availableCards = MOCK_CARDS.filter((card: any) => !existingIds.has(card.id))
-    const newCards = availableCards.slice(0, count)
     
-    if (newCards.length === 0) {
-      console.log('沒有更多卡片可載入')
+    if (availableCards.length === 0) {
+      console.log('沒有更多卡片可載入 - 所有mock卡片已存在')
       return []
     }
     
-    // 更新新卡片的時間，讓它們立即可用
-    const cardsToAdd = newCards.map((card: any) => ({
-      ...card,
-      nextReviewAt: new Date().toISOString(),
-      lastReviewedAt: null,
-      reps: 0,
-      interval: 0
-    }))
+    const newCards = availableCards.slice(0, count)
+    
+    // 確保每張新卡片都有唯一的ID（避免重複）
+    const cardsToAdd = newCards.map((card: any, index: number) => {
+      const uniqueId = `${card.id}_${Date.now()}_${index}`
+      return {
+        ...card,
+        id: uniqueId, // 使用唯一ID避免重複
+        nextReviewAt: new Date().toISOString(),
+        lastReviewedAt: null,
+        reps: 0,
+        interval: 0
+      }
+    })
     
     // 加入到現有卡片
     const updatedCards = [...existingCards, ...cardsToAdd]
     this.setStoredCards(updatedCards)
     
     console.log(`✅ 已加入 ${cardsToAdd.length} 張新卡片`)
+    console.log(`📊 總卡片數量: ${existingCards.length} -> ${updatedCards.length}`)
     return cardsToAdd
   }
 

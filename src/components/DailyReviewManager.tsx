@@ -110,7 +110,7 @@ const DailyReviewManager: React.FC<DailyReviewManagerProps> = ({
         )
       })
 
-      // 成功後更新狀態
+      // 成功後更新狀態 - 只有實際評分才計數
       setReviewedCount(prev => prev + 1)
       handleNextCard()
 
@@ -135,7 +135,17 @@ const DailyReviewManager: React.FC<DailyReviewManagerProps> = ({
       originalPosition
     }))
 
-    // 從當前佇列移除卡片
+    // 修復：特殊處理最後一張卡片的情況
+    if (currentIndex === reviewQueue.length - 1) {
+      // 如果是最後一張卡片，直接重新插入到當前位置
+      const updatedQueue = [...reviewQueue]
+      updatedQueue.splice(currentIndex, 0, currentCard)
+      setReviewQueue(updatedQueue)
+      // 保持當前索引不變，讓使用者重複練習這張卡片
+      return
+    }
+
+    // 正常情況：從當前佇列移除卡片
     const newQueue = reviewQueue.filter((_, index) => index !== currentIndex)
     
     // 使用 Again 佇列邏輯重新插入
