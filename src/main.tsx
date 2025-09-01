@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import AppLauncher from './components/AppLauncher'
+import App from './App'
 import DevTestPage from './DevTestPage'
 import './index.css'
 
@@ -21,7 +21,7 @@ enableMocking().then(() => {
   
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-      {isTestMode ? <DevTestPage /> : <AppLauncher />}
+      {isTestMode ? <DevTestPage /> : <App />}
     </React.StrictMode>
   )
 })
