@@ -97,18 +97,18 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
   }
 
   return (
-    <div className="settings-page max-w-2xl mx-auto p-6">
+    <div className="settings-page max-w-2xl mx-auto p-4 sm:p-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-2">學習設定</h1>
         <p className="text-gray-600">調整您的個人化學習參數</p>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {/* 每日學習量設定 */}
-        <section className="bg-white rounded-lg border p-6">
+        <section className="bg-white rounded-lg border p-4 sm:p-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">每日學習量</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 每日複習上限
@@ -157,15 +157,15 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
         </section>
 
         {/* 演算法設定 */}
-        <section className="bg-white rounded-lg border p-6">
+        <section className="bg-white rounded-lg border p-4 sm:p-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">複習演算法</h2>
           
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 演算法類型
               </label>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
                 <label className="flex items-center">
                   <input
                     type="radio"
@@ -192,13 +192,13 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
         </section>
 
         {/* Again 間隔設定 */}
-        <section className="bg-white rounded-lg border p-6">
+        <section className="bg-white rounded-lg border p-4 sm:p-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Again 重現間隔</h2>
           <p className="text-sm text-gray-600 mb-4">
             按下 Again 按鈕後，卡片重新出現的位置間隔（以卡片數計算）
           </p>
           
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
             {settings.againGapSequence.map((gap, index) => (
               <div key={index}>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -219,13 +219,13 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
         </section>
 
         {/* 優先權重設定 */}
-        <section className="bg-white rounded-lg border p-6">
+        <section className="bg-white rounded-lg border p-4 sm:p-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">優先排序權重</h2>
           <p className="text-sm text-gray-600 mb-4">
             調整不同因素在卡片優先排序中的重要性（權重總和建議為 1.0）
           </p>
           
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 難度權重（{settings.priorityWeights.ease.toFixed(1)}）
@@ -294,7 +294,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
       </div>
 
       {/* 操作按鈕 */}
-      <div className="flex justify-between items-center mt-8 pt-6 border-t">
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-0 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t">
         <button
           onClick={handleReset}
           className="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
@@ -302,7 +302,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
           重置為預設值
         </button>
 
-        <div className="flex gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {isDirty && (
             <span className="text-sm text-orange-600 self-center">
               * 設定已修改

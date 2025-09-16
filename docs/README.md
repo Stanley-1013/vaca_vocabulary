@@ -171,7 +171,7 @@ npm run test:coverage     # 覆蓋率報告
 
 - 詳細開發流程請參閱 [CONTRIBUTING.md](./CONTRIBUTING.md)
 - 功能規格與 API 文件請參閱 [SPEC.md](./SPEC.md)
-- 開發流程與 DoR/DoD 請參閱 [PROCESS.md](./PROCESS.md)
+- 開發流程與架構決策請參閱 [ARCHITECTURE.md](./ARCHITECTURE.md)
 
 ## 🗓 專案狀態
 

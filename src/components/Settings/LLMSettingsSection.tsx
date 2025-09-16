@@ -187,28 +187,14 @@ const LLMSettingsSection: React.FC<LLMSettingsSectionProps> = ({
         </div>
       )}
 
-      {/* API Key 設定（商業服務） */}
+      {/* API Key 設定（商業服務） - 後端代理後，前端不再保存金鑰，只顯示狀態與提示 */}
       {llmConfig.provider !== 'colab' && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <h4 className="font-medium text-yellow-800 mb-2">🔑 API 設定</h4>
-          <div>
-            <label className="block text-sm font-medium text-yellow-700 mb-1">
-              API Key
-            </label>
-            <input
-              type="password"
-              value={llmConfig.apiKey || ''}
-              onChange={(e) => onUpdateLLMConfig({
-                ...llmConfig,
-                apiKey: e.target.value
-              })}
-              placeholder={`輸入 ${llmConfig.provider.toUpperCase()} API Key`}
-              className="w-full px-3 py-2 border border-yellow-300 rounded-md focus:ring-2 focus:ring-yellow-500"
-            />
-            <p className="text-xs text-yellow-600 mt-1">
-              API Key 將安全地保存在本地，不會上傳到伺服器
-            </p>
-          </div>
+          <p className="text-sm text-yellow-700">
+            已使用伺服器代理模式。請在後端（Apps Script → Project Settings → Script properties）設定
+            <span className="font-mono"> GEMINI_API_KEY</span>。前端不保存金鑰。
+          </p>
         </div>
       )}
     </section>

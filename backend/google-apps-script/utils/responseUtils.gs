@@ -99,19 +99,12 @@ const ResponseUtils = {
    * @returns {TextOutput} CORS回應
    */
   corsResponse: function(headers = {}) {
-    const defaultCorsHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': Config.CORS.ALLOWED_METHODS.join(', '),
-      'Access-Control-Allow-Headers': Config.CORS.ALLOWED_HEADERS.join(', '),
-      'Access-Control-Max-Age': '86400'
-    };
+    // Google Apps Script 中需要特殊處理 CORS
+    const response = ContentService
+      .createTextOutput('')
+      .setMimeType(ContentService.MimeType.TEXT);
     
-    const mergedHeaders = Object.assign(defaultCorsHeaders, headers);
-    
-    return this.createResponse({
-      ok: true,
-      message: 'CORS preflight'
-    }, 200, mergedHeaders);
+    return response;
   },
   
   /**
@@ -126,28 +119,15 @@ const ResponseUtils = {
       .createTextOutput(JSON.stringify(data))
       .setMimeType(ContentService.MimeType.JSON);
     
-    // 設定預設headers
-    const defaultHeaders = {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
-    };
-    
-    // 合併headers
-    const allHeaders = Object.assign(defaultHeaders, headers);
-    
-    // 設定所有headers
-    Object.keys(allHeaders).forEach(function(key) {
-      response.setHeader(key, allHeaders[key]);
-    });
+    // Google Apps Script 不支援 setHeader，只能設定基本的 MIME type
+    // headers 參數保留以維持 API 相容性，但實際上無法設定
     
     // 記錄回應（僅在開發模式）
     if (Config.LOG_LEVEL === 'DEBUG') {
       Logger.log('Response: ' + JSON.stringify({
         statusCode: statusCode,
         data: data,
-        headers: allHeaders
+        headers: headers
       }));
     }
     

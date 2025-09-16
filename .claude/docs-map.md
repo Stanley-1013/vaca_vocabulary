@@ -28,10 +28,13 @@ docs/
 ## 📋 文檔類型說明
 
 ### 🎯 一次性規範 (設定後少更動)
-- **README.md** - 專案介紹、技術棧、環境設定
-- **SPEC.md** - 功能規格、API 介面、架構設計  
-- **CONTRIBUTING.md** - Git Flow、程式碼風格、審查標準
-- **PROCESS.md** - DoR/DoD、測試策略、發布流程
+## 核心文檔
+
+- **README.md**: 專案首頁，提供總體介紹和快速開始指南。
+- **docs/ARCHITECTURE.md**: 核心架構決策，解釋了技術選型和設計理念。
+- **docs/SETUP_GUIDE.md**: 詳細的環境設定和部署指南。
+- **docs/specs/SPEC.md**: 應用程式的功能規格和 API 定義。
+- **docs/guides/CONTRIBUTING.md**: 開發貢獻指南，包括 Git 流程和程式碼風格。
 
 ### 🔄 常態更新 (開發過程持續維護)
 - **TODOLIST.md** - 任務狀態、進度追蹤、里程碑

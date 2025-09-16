@@ -655,7 +655,7 @@ Console 錯誤訊息或螢幕截圖
 
 ### 內部文件
 - [SPEC.md](./SPEC.md) - 功能規格與 API 文件
-- [PROCESS.md](./PROCESS.md) - 開發流程與 DoR/DoD
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - 核心架構決策
 - [TESTCASES.md](./TESTCASES.md) - 測試案例與驗收標準
 
 ---

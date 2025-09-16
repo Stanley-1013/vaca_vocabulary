@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { LLMSuggestRequest, LLMGenerateRequest, Card } from '../types'
+import { suggestWords } from '../services/llm'
 
 /**
  * LLM 單字生成 Hook
@@ -29,70 +30,14 @@ export function useLLMGenerate() {
 
       setLastRequest(llmRequest)
 
-      // TODO: 實際的 Google Drive API 整合
-      // 目前先模擬 API 調用
-      console.log('🚀 發送 LLM 請求:', request)
-      
-      // 模擬處理時間
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // 模擬生成結果
-      const mockCards: Omit<Card, 'id' | 'box' | 'ease' | 'reps' | 'interval' | 'lastReviewedAt' | 'nextReviewAt' | 'createdAt'>[] = [
-        {
-          word: {
-            base: "substantial",
-            phonetic: "/səbˈstænʃəl/",
-            forms: [
-              { pos: "adj.", form: "substantial" },
-              { pos: "adv.", form: "substantially" }
-            ]
-          },
-          posPrimary: "adj.",
-          meaning: "大量的；重要的；堅固的",
-          synonyms: ["significant", "considerable", "important"],
-          antonyms: ["minor", "trivial", "insignificant"],
-          example: "The company made substantial progress in reducing costs.",
-          tags: request.tags || ["general"],
-          anchors: []
-        },
-        {
-          word: {
-            base: "correspond",
-            phonetic: "/ˌkɔːrɪˈspɒnd/",
-            forms: [
-              { pos: "v.", form: "corresponds" },
-              { pos: "v.", form: "corresponded" },
-              { pos: "v.", form: "corresponding" }
-            ]
-          },
-          posPrimary: "v.",
-          meaning: "相符合；通信；相當於",
-          synonyms: ["match", "align", "communicate"],
-          antonyms: ["differ", "conflict"],
-          example: "These findings correspond with our previous research.",
-          tags: request.tags || ["general"],
-          anchors: []
-        }
-      ]
-
-      // 轉換為完整的 Card 對象
-      const cards: Card[] = mockCards.map((mockCard, index) => ({
-        ...mockCard,
-        id: `llm_card_${requestId}_${index}`,
-        box: 1,
-        ease: 2.5,
-        reps: 0,
-        interval: 0,
-        lastReviewedAt: null,
-        nextReviewAt: timestamp,
-        createdAt: timestamp
-      }))
+      // 呼叫後端代理產生卡片
+      const cards: Card[] = await suggestWords(request)
 
       // 更新請求狀態
       const completedRequest: LLMGenerateRequest = {
         ...llmRequest,
         status: 'completed',
-        response: { cards: mockCards }
+        response: { cards }
       }
       
       setLastRequest(completedRequest)

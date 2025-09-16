@@ -12,15 +12,19 @@
   body {
     margin: 0;
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #111827; /* Dark background */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   #root {
-    min-height: 100vh;
+    min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 1rem;
+    padding-top: calc(1rem + env(safe-area-inset-top));
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
   }
 }
 

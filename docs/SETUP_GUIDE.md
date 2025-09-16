@@ -169,7 +169,7 @@ VACA 使用以下服務來提供完整功能：
 
 ---
 
-## 📱 Capacitor 應用程式部署（依據 ADR-003）
+## 📱 Capacitor 應用程式部署
 
 ### 安裝 Capacitor
 

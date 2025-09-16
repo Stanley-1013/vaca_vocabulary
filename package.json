@@ -1,6 +1,6 @@
 {
   "name": "vaca-app",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "description": "Vocabulary Learning App with TDD approach",
   "directories": {
@@ -9,12 +9,17 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "npm run security-check && tsc && vite build",
+    "build:unsafe": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "security-check": "node scripts/security-check.cjs",
+    "prebuild": "npm run security-check",
+    "vercel-dev": "vercel dev",
+    "deploy": "vercel --prod"
   },
   "keywords": [
     "vocabulary",
@@ -25,10 +30,28 @@
   "author": "Claude Code",
   "license": "MIT",
   "dependencies": {
+    "@appletosolutions/reactbits": "^1.0.3",
+    "@motionone/types": "^10.17.1",
+    "@react-three/drei": "^10.7.6",
+    "@react-three/fiber": "^9.3.0",
+    "@react-three/postprocessing": "^3.0.4",
+    "@react-three/rapier": "^2.1.0",
     "@tanstack/react-query": "^5.0.0",
+    "@vercel/node": "^3.0.21",
+    "dotenv": "^17.2.2",
+    "framer-motion": "^12.23.13",
+    "gl-matrix": "^3.4.4",
+    "googleapis": "^144.0.0",
+    "gsap": "^3.13.0",
+    "matter-js": "^0.20.0",
+    "meshline": "^3.3.1",
+    "ogl": "^1.0.11",
+    "postprocessing": "^6.37.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "tailwindcss": "^3.3.0"
+    "tailwindcss": "^3.3.0",
+    "three": "^0.180.0",
+    "three-stdlib": "^2.36.0"
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "^5.85.5",
@@ -49,6 +72,7 @@
     "msw": "^2.0.0",
     "postcss": "^8.4.27",
     "typescript": "^5.0.2",
+    "vercel": "^37.6.1",
     "vite": "^4.4.5",
     "vitest": "^1.0.0"
   },

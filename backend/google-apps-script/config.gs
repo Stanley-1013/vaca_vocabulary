@@ -7,7 +7,7 @@
 
 const Config = {
   // Google Sheets 配置
-  SHEET_ID: '你的Google_Sheet_ID_需要替換', // 需要替換為實際的Sheet ID
+  SHEET_ID: '1eZmBKuJQocALTnA1VZem6oushLIRq4sGKvKbyxfohTM', // VACA 背單字資料庫
   SHEET_NAME: 'cards',
   
   // 時區配置

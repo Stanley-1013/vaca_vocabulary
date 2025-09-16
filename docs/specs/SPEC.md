@@ -325,7 +325,7 @@ Content-Type: application/json
 
 ## 🏗 架構設計
 
-### MVP架構策略 (基於ADR-001)
+### MVP架構策略 (參考 [ARCHITECTURE.md](../ARCHITECTURE.md))
 
 **Phase 1 MVP**: 快速交付策略，使用抽象化服務層預留後端整合鉤子
 

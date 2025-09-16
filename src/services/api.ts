@@ -138,7 +138,7 @@ class HttpApiService implements IApiService {
     // 設定預設headers和timeout
     const defaultOptions: RequestInit = {
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'text/plain;charset=utf-8',  // 避免 CORS 預檢請求
         ...options.headers
       },
       signal: AbortSignal.timeout(this.timeout)

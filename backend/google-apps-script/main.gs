@@ -6,13 +6,16 @@
  */
 
 /**
- * HTTP GET 請求處理器
+ * HTTP GET 請求處理器 (也處理 OPTIONS 預檢請求)
  * @param {Object} e - 請求事件對象
  * @returns {TextOutput} HTTP 回應
  */
 function doGet(e) {
   try {
-    return Router.handle(e, 'GET');
+    // Google Apps Script 中 OPTIONS 請求會被當作 GET 處理
+    // 需要檢查是否為 CORS 預檢請求
+    const method = (e.parameter && e.parameter._method) || 'GET';
+    return Router.handle(e, method);
   } catch (error) {
     Logger.log('doGet error: ' + error.toString());
     return ResponseUtils.serverError('Internal server error');

@@ -75,11 +75,12 @@ const ReviewControls: React.FC<ReviewControlsProps> = ({
   }
 
   const buttonBaseClass = `
-    px-6 py-3 rounded-lg font-semibold text-white
+    px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-white
     transition-all duration-200 ease-in-out
     focus:outline-none focus:ring-2 focus:ring-offset-2
     disabled:opacity-50 disabled:cursor-not-allowed
     hover:transform hover:scale-105 active:scale-95
+    text-sm sm:text-base
   `
 
   // 獲取間隔預測文字
@@ -101,7 +102,7 @@ const ReviewControls: React.FC<ReviewControlsProps> = ({
   // vNext 模式：四個按鈕
   if (onAgain) {
     return (
-      <div className="review-controls flex gap-3 justify-center mt-6">
+      <div className="review-controls flex flex-wrap gap-2 sm:gap-3 justify-center mt-4 sm:mt-6">
         <button
           data-testid="again-button"
           onClick={handleAgainClick}
@@ -187,7 +188,7 @@ const ReviewControls: React.FC<ReviewControlsProps> = ({
 
   // 傳統模式：三個按鈕（向下相容）
   return (
-    <div className="review-controls flex gap-4 justify-center mt-6">
+    <div className="review-controls flex flex-wrap gap-2 sm:gap-4 justify-center mt-4 sm:mt-6">
       <button
         data-testid="quality-1"
         onClick={() => handleButtonClick(1)}

@@ -161,7 +161,7 @@ export const FeatureFlagDebugPanel: React.FC<{ visible?: boolean }> = ({
       <>
         <button
           onClick={() => setIsVisible(!isVisible)}
-          className="fixed bottom-2 right-2 sm:bottom-4 sm:right-16 bg-gray-800 text-white px-2 py-1 sm:px-3 sm:py-1 rounded text-xs z-50 shadow-lg"
+          className="fixed right-[calc(env(safe-area-inset-right,0)+0.5rem)] top-[calc(env(safe-area-inset-top,0)+0.5rem)] sm:top-auto sm:bottom-[calc(env(safe-area-inset-bottom,0)+1rem)] sm:right-16 bg-gray-800 text-white px-2 py-1 sm:px-3 sm:py-1 rounded text-xs z-50 shadow-lg"
           style={{ fontSize: '10px' }}
         >
           <span className="hidden sm:inline">🏳️ FF</span>
