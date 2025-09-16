@@ -16,7 +16,7 @@ import { useDueCards } from '../hooks/useDueCards';
 import { useReviewCard } from '../hooks/useReviewCard';
 
 // --- Component Imports ---
-import SetupWizard, { UserConfig } from './Setup/SetupWizard';
+import ImprovedSetupWizard, { ImprovedUserConfig } from './Setup/ImprovedSetupWizard';
 import DailyReviewManager from './DailyReviewManager';
 import SettingsPage from './SettingsPage';
 import LanguageSelector from './LanguageSelector';
@@ -196,15 +196,56 @@ const AppLauncher: React.FC = () => {
     determineView();
   }, [isConfigured, isAuthenticated, updateConfig, initializeAPI, authenticate]);
 
-  const handleSetupComplete = (newConfig: UserConfig) => {
-    updateConfig(newConfig);
-    setCurrentView('authenticating');
+  const handleSetupComplete = (newConfig: ImprovedUserConfig) => {
+    // 轉換簡化設定為完整設定格式
+    const fullConfig = {
+      googleSheetId: newConfig.googleSheetId,
+      llmProvider: 'gemini' as const,
+      llmApiKey: newConfig.geminiApiKey,
+      setupCompleted: true,
+      googleAuthCompleted: false, // 讓正常的認證流程處理
+      llmConfigCompleted: true,
+      // 同時保存學習偏好
+      dailyGoal: newConfig.dailyGoal,
+      difficulty: newConfig.difficulty,
+      preferredTopics: newConfig.preferredTopics,
+      examTypes: newConfig.examTypes
+    };
+
+    // 儲存完整設定
+    localStorage.setItem('improvedUserConfig', JSON.stringify(newConfig));
+
+    // 建立對應的 vNext 設定
+    const vNextSettings = {
+      maxDailyReviews: newConfig.dailyGoal * 4,
+      minNewPerDay: Math.max(1, newConfig.dailyGoal - 2),
+      maxNewPerDay: newConfig.dailyGoal,
+      algorithm: 'leitner',
+      againGapSequence: [2, 5, 10],
+      priorityWeights: { ease: 0.5, overdueDays: 0.3, box: 0.2 },
+      llmConfig: {
+        provider: 'gemini',
+        driveBasePath: '/VACA_LLM',
+        modelName: 'gemini-1.5-flash'
+      },
+      preferredExamTypes: newConfig.examTypes,
+      defaultDifficulty: newConfig.difficulty,
+      generateCount: newConfig.dailyGoal,
+      preferredTopics: newConfig.preferredTopics
+    };
+
+    localStorage.setItem('vNextSettings', JSON.stringify(vNextSettings));
+
+    updateConfig(fullConfig);
+
+    // 直接跳到 app，跳過認證步驟
+    setCurrentView('app');
   };
 
   const renderView = () => {
     switch (currentView) {
       case 'loading': return <LoadingView />;
-      case 'setup': return <SetupWizard onComplete={handleSetupComplete} />;
+      case 'setup': return <ImprovedSetupWizard onComplete={handleSetupComplete} />;
       case 'authenticating': return <AuthenticatingView />;
       case 'app': return <AppView />;
       default: return <LoadingView />;

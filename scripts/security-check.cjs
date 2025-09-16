@@ -14,19 +14,19 @@ console.log('🔐 VACA App 安全性檢查\n');
 // 檢查 .gitignore 保護
 function checkGitignore() {
   const gitignorePath = path.join(__dirname, '../.gitignore');
-  
+
   if (!fs.existsSync(gitignorePath)) {
     console.error('❌ .gitignore 檔案不存在！');
     return false;
   }
-  
+
   const content = fs.readFileSync(gitignorePath, 'utf-8');
   const requiredPatterns = ['.env', '.env.production', '.env.local'];
-  
-  const isProtected = requiredPatterns.every(pattern => 
+
+  const isProtected = requiredPatterns.every(pattern =>
     content.includes(pattern)
   );
-  
+
   if (isProtected) {
     console.log('✅ .gitignore 保護設定正確');
     return true;
